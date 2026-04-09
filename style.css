@@ -1,0 +1,262 @@
+/* Variables de Diseño */
+:root {
+    --bg-black: #050505;
+    --surface-grey: #121212;
+    --text-white: #FFFFFF;
+    --text-muted: #A0A0A0;
+    --transition: all 0.3s ease;
+}
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif; /* Asegúrate de importar esta fuente o usar una similar */
+}
+
+body {
+    background-color: var(--bg-black);
+    color: var(--text-white);
+}
+
+/* Contenedor para alinear el ancho de la página */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Estilos del Header */
+.main-header {
+    background-color: rgba(5, 5, 5, 0.95); /* Efecto levemente traslúcido */
+    height: 80px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Logo */
+.logo a {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-white);
+    text-decoration: none;
+    letter-spacing: -1px;
+}
+
+.logo span {
+    color: var(--text-muted); /* El HP en gris para darle un toque tech */
+}
+
+/* Menú de Navegación */
+.nav-list {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: var(--transition);
+}
+
+.nav-link:hover {
+    color: var(--text-white);
+}
+
+/* Botón de Carrito */
+.cart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--bg-black);
+    background-color: var(--text-white);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.cart-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}
+
+.cart-btn:hover {
+    background-color: var(--text-muted);
+}
+
+/* Footer */
+.site-footer {
+    margin-top: 96px;
+    background: linear-gradient(180deg, #080808 0%, #050505 100%);
+    border-top: 1px solid #1a1a1a;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 48px;
+    padding: 56px 20px 48px;
+    text-align: center;
+}
+
+.footer-column {
+    flex: 1 1 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.footer-brand {
+    max-width: 420px;
+}
+
+.footer-logo {
+    display: inline-block;
+    margin-bottom: 18px;
+    color: var(--text-white);
+    text-decoration: none;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.footer-logo span {
+    color: var(--text-muted);
+}
+
+.footer-description {
+    max-width: 36ch;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.footer-title {
+    margin-bottom: 18px;
+    color: var(--text-white);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.footer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-link:hover {
+    color: var(--text-white);
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.social-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}
+
+.footer-bottom {
+    border-top: 1px solid #141414;
+}
+
+.footer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px 24px;
+    padding-top: 20px;
+}
+
+.footer-meta-item,
+.footer-meta-link {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-meta-link:hover {
+    color: var(--text-white);
+}
+
+.footer-copy {
+    padding: 18px 0 28px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .main-header {
+        height: auto;
+    }
+
+    .header-flex {
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 16px 0;
+    }
+
+    .nav-list {
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    .footer-content {
+        gap: 32px;
+        padding-top: 44px;
+        padding-bottom: 36px;
+    }
+
+    .footer-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
