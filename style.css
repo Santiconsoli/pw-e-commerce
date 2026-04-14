@@ -124,6 +124,7 @@ img {
     width: 100%;
     margin-top: 18px;
     border: 1px solid #1f1f1f;
+    border-radius: 12px;
     background-color: transparent;
     color: var(--text-white);
     min-height: 46px;
@@ -151,6 +152,39 @@ main {
     background:
         radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 28%),
         linear-gradient(180deg, #050505 0%, #070707 100%);
+    isolation: isolate;
+}
+
+.hero-lines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero-line {
+    right: -8%;
+    width: 58%;
+    height: 4px;
+    position: absolute;
+    transform: rotate(-34deg);
+    transform-origin: right center;
+    opacity: 0.9;
+}
+
+.hero-line-blue {
+    top: 28%;
+    background: linear-gradient(90deg, transparent 0%, rgba(60, 126, 255, 0.95) 35%, transparent 100%);
+}
+
+.hero-line-gold {
+    top: 42%;
+    background: linear-gradient(90deg, transparent 0%, rgba(212, 167, 73, 0.95) 35%, transparent 100%);
+}
+
+.hero-line-red {
+    top: 56%;
+    background: linear-gradient(90deg, transparent 0%, rgba(196, 25, 47, 0.95) 35%, transparent 100%);
 }
 
 .hero-layout {
@@ -159,6 +193,8 @@ main {
     justify-content: space-between;
     gap: 56px;
     min-height: calc(100vh - 120px);
+    position: relative;
+    z-index: 1;
 }
 
 .hero-copy {
@@ -214,11 +250,12 @@ main {
 
 .hero-figure {
     position: relative;
-    flex: 1 1 520px;
-    min-height: 620px;
-    padding: 28px;
+    flex: 0 1 450px;
+    width: min(100%, 450px);
+    aspect-ratio: 1 / 1;
+    padding: 14px;
     border: 1px solid #1a1a1a;
-    border-radius: 32px;
+    border-radius: 22px;
     background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent 55%),
         #0a0a0a;
@@ -229,11 +266,11 @@ main {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 24px;
+    border-radius: 16px;
 }
 
 .collection-section {
-    padding: 48px 0 56px;
+    padding: 48px 0 0;
 }
 
 .section-heading {
@@ -258,7 +295,7 @@ main {
 }
 
 .product-card {
-    border: 1px solid #1a1a1a;
+    border: 1px solid rgba(212, 167, 73, 0.55);
     border-radius: 28px;
     background: linear-gradient(180deg, #090909 0%, #070707 100%);
     overflow: hidden;
@@ -274,6 +311,7 @@ main {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform 0.6s ease;
 }
 
@@ -303,7 +341,7 @@ main {
     justify-content: center;
     align-items: center;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 36px;
 }
 
 .brand-logo-card {
@@ -414,8 +452,26 @@ main {
 .cart-item-top {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     gap: 16px;
     margin-bottom: 14px;
+}
+
+.cart-item-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.cart-item-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    object-position: center;
+    border: 1px solid #1f1f1f;
+    border-radius: 10px;
+    flex-shrink: 0;
 }
 
 .cart-item-name {
@@ -529,7 +585,7 @@ main {
 
 /* Footer */
 .site-footer {
-    margin-top: 28px;
+    margin-top: 36px;
     background: linear-gradient(180deg, #080808 0%, #050505 100%);
     border-top: 1px solid #1a1a1a;
 }
@@ -693,18 +749,19 @@ main {
     }
 
     .hero-figure {
-        min-height: auto;
-        padding: 16px;
-        border-radius: 24px;
+        max-width: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 20px;
     }
 
     .hero-figure img {
-        border-radius: 18px;
+        border-radius: 14px;
     }
 
     .collection-section {
         padding-top: 28px;
-        padding-bottom: 72px;
+        padding-bottom: 0;
     }
 
     .section-heading {
@@ -717,7 +774,11 @@ main {
 
     .brand-strip {
         gap: 8px;
-        margin-top: 28px;
+        margin-top: 32px;
+    }
+
+    .site-footer {
+        margin-top: 32px;
     }
 
     .brand-logo-card {

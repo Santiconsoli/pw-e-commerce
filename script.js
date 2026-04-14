@@ -68,9 +68,12 @@ function renderCart() {
         listItem.className = "cart-item";
         listItem.innerHTML = `
             <div class="cart-item-top">
-                <div>
-                    <p class="cart-item-name">${item.name}</p>
-                    <p class="cart-item-price">${formatPrice(item.price)}</p>
+                <div class="cart-item-main">
+                    <img class="cart-item-thumb" src="${item.image}" alt="${item.name}">
+                    <div>
+                        <p class="cart-item-name">${item.name}</p>
+                        <p class="cart-item-price">${formatPrice(item.price)}</p>
+                    </div>
                 </div>
                 <p class="cart-item-price">${formatPrice(item.price * item.quantity)}</p>
             </div>
@@ -150,6 +153,7 @@ addToCartButtons.forEach((button) => {
             id: button.dataset.productId,
             name: button.dataset.productName,
             price: Number(button.dataset.productPrice),
+            image: button.dataset.productImage,
         });
     });
 });
