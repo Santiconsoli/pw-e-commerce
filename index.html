@@ -28,14 +28,21 @@
             </nav>
 
             <div class="header-actions">
-                <a href="#carrito" class="cart-btn" aria-label="Carrito de compras con 0 productos">
+                <button
+                    type="button"
+                    class="cart-btn"
+                    id="cart-toggle"
+                    aria-label="Abrir carrito de compras con 0 productos"
+                    aria-controls="cart-panel"
+                    aria-expanded="false"
+                >
                     <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                         <path d="M3 4h2l2.2 9.2A2 2 0 0 0 9.15 15H18a2 2 0 0 0 1.94-1.5L21 8H7.1"></path>
                         <circle cx="10" cy="19" r="1.5"></circle>
                         <circle cx="18" cy="19" r="1.5"></circle>
                     </svg>
-                    <span>CARRITO (0)</span>
-                </a>
+                    <span>GARAGE (<span id="cart-count">0</span>)</span>
+                </button>
             </div>
         </div>
     </header>
@@ -78,7 +85,16 @@
                         </figure>
                         <div class="product-info">
                             <h3>Mesa BMW</h3>
-                            <p>USD 2,400</p>
+                            <p class="price">USD 2,400</p>
+                            <button
+                                type="button"
+                                class="btn-add"
+                                data-product-id="mesa-bmw"
+                                data-product-name="Mesa BMW"
+                                data-product-price="2400"
+                            >
+                                AÑADIR AL GARAGE
+                            </button>
                         </div>
                     </article>
 
@@ -91,7 +107,16 @@
                         </figure>
                         <div class="product-info">
                             <h3>Sillon Porsche</h3>
-                            <p>USD 3,100</p>
+                            <p class="price">USD 3,100</p>
+                            <button
+                                type="button"
+                                class="btn-add"
+                                data-product-id="sillon-porsche"
+                                data-product-name="Sillon Porsche"
+                                data-product-price="3100"
+                            >
+                                AÑADIR AL GARAGE
+                            </button>
                         </div>
                     </article>
 
@@ -104,7 +129,16 @@
                         </figure>
                         <div class="product-info">
                             <h3>Consola AMG</h3>
-                            <p>USD 2,950</p>
+                            <p class="price">USD 2,950</p>
+                            <button
+                                type="button"
+                                class="btn-add"
+                                data-product-id="consola-amg"
+                                data-product-name="Consola AMG"
+                                data-product-price="2950"
+                            >
+                                AÑADIR AL GARAGE
+                            </button>
                         </div>
                     </article>
                 </div>
@@ -112,10 +146,38 @@
         </section>
     </main>
 
+    <div class="cart-overlay" id="cart-overlay" hidden></div>
+    <aside class="cart-panel" id="cart-panel" aria-hidden="true" aria-labelledby="cart-title">
+        <div class="cart-panel-header">
+            <div>
+                <p class="cart-panel-eyebrow">525hp</p>
+                <h2 id="cart-title">Tu Garage</h2>
+            </div>
+            <button type="button" class="cart-close" id="cart-close" aria-label="Cerrar carrito">×</button>
+        </div>
+
+        <div class="cart-panel-body">
+            <p class="cart-empty" id="cart-empty">A tu Garage le falta vida.</p>
+            <ul class="cart-items" id="cart-items"></ul>
+        </div>
+
+        <div class="cart-panel-footer">
+            <div class="cart-summary">
+                <span>Subtotal</span>
+                <strong id="cart-subtotal">USD 0</strong>
+            </div>
+            <div class="cart-actions">
+                <button type="button" class="cart-secondary-btn" id="cart-continue">Seguir comprando</button>
+                <button type="button" class="cart-secondary-btn" id="cart-clear">Vaciar Garage</button>
+                <button type="button" class="cart-primary-btn" id="cart-checkout">Finalizar compra</button>
+            </div>
+        </div>
+    </aside>
+
     <footer class="site-footer" id="contacto">
         <div class="container footer-content">
             <div class="footer-column footer-brand">
-                <a href="#" class="footer-logo">525<span>hp</span></a>
+                <span class="footer-logo">525<span>hp</span></span>
                 <p class="footer-description">
                     Muebles y artículos de lujo creados a partir de piezas automotrices icónicas, con una presencia sobria,
                     técnica y contemporánea.
@@ -125,10 +187,10 @@
             <div class="footer-column">
                 <h2 class="footer-title">Enlaces rápidos</h2>
                 <ul class="footer-list">
-                    <li><a href="#inicio" class="footer-link">Inicio</a></li>
-                    <li><a href="#catalogo" class="footer-link">Catálogo</a></li>
-                    <li><a href="#nosotros" class="footer-link">Nosotros</a></li>
-                    <li><a href="#contacto" class="footer-link">Contacto</a></li>
+                    <li><span class="footer-link footer-static">Inicio</span></li>
+                    <li><span class="footer-link footer-static">Catálogo</span></li>
+                    <li><span class="footer-link footer-static">Nosotros</span></li>
+                    <li><span class="footer-link footer-static">Contacto</span></li>
                 </ul>
             </div>
 
@@ -136,41 +198,41 @@
                 <h2 class="footer-title">Redes sociales</h2>
                 <ul class="footer-list">
                     <li>
-                        <a href="#" class="footer-link social-link" aria-label="Instagram de 525hp">
+                        <span class="footer-link social-link footer-static" aria-label="Instagram de 525hp">
                             <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <rect x="3" y="3" width="18" height="18" rx="5"></rect>
                                 <circle cx="12" cy="12" r="4"></circle>
                                 <circle cx="17.5" cy="6.5" r="1"></circle>
                             </svg>
                             <span>Instagram</span>
-                        </a>
+                        </span>
                     </li>
                     <li>
-                        <a href="#" class="footer-link social-link" aria-label="Facebook de 525hp">
+                        <span class="footer-link social-link footer-static" aria-label="Facebook de 525hp">
                             <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <path d="M14 8h3V4h-3a5 5 0 0 0-5 5v3H6v4h3v4h4v-4h3.2l.8-4H13V9a1 1 0 0 1 1-1Z"></path>
                             </svg>
                             <span>Facebook</span>
-                        </a>
+                        </span>
                     </li>
                     <li>
-                        <a href="#" class="footer-link social-link" aria-label="LinkedIn de 525hp">
+                        <span class="footer-link social-link footer-static" aria-label="LinkedIn de 525hp">
                             <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <rect x="4" y="9" width="4" height="11"></rect>
                                 <circle cx="6" cy="5.5" r="2"></circle>
                                 <path d="M11 9h4v1.8c.7-1.1 1.9-2.1 4-2.1 3.1 0 4 2.1 4 5.3V20h-4v-5.1c0-1.5-.3-2.7-1.9-2.7-1.6 0-2.1 1.1-2.1 2.7V20h-4Z"></path>
                             </svg>
                             <span>LinkedIn</span>
-                        </a>
+                        </span>
                     </li>
                     <li>
-                        <a href="#" class="footer-link social-link" aria-label="WhatsApp de 525hp">
+                        <span class="footer-link social-link footer-static" aria-label="WhatsApp de 525hp">
                             <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <path d="M12 21a8.9 8.9 0 0 1-4.5-1.2L3 21l1.3-4.3A9 9 0 1 1 12 21Z"></path>
                                 <path d="M9.1 7.8c.2-.4.4-.5.7-.5h.6c.2 0 .4 0 .6.5l.6 1.5c.1.3.1.5-.1.7l-.5.6c-.1.1-.2.3-.1.5.3.6.8 1.2 1.4 1.8.7.6 1.4 1 2.1 1.3.2.1.4 0 .5-.1l.7-.8c.2-.2.4-.2.7-.1l1.4.7c.3.1.5.3.4.6l-.2.9c-.1.3-.3.6-.6.7-.5.2-1.2.2-1.9 0-1.1-.3-2.3-.9-3.5-1.9-1.1-.9-2-2.1-2.5-3.3-.4-.8-.5-1.5-.3-2.1Z"></path>
                             </svg>
                             <span>WhatsApp</span>
-                        </a>
+                        </span>
                     </li>
                 </ul>
             </div>
@@ -181,13 +243,14 @@
                 <div class="footer-meta">
                     <span class="footer-meta-item">AR | Argentina 🇦🇷</span>
                     <span class="footer-meta-item">Idioma | Español</span>
-                    <a href="#" class="footer-meta-link">Términos y Condiciones del sitio web</a>
-                    <a href="#" class="footer-meta-link">Privacidad</a>
-                    <a href="#" class="footer-meta-link">Política de cookies</a>
+                    <span class="footer-meta-link footer-static">Términos y Condiciones del sitio web</span>
+                    <span class="footer-meta-link footer-static">Privacidad</span>
+                    <span class="footer-meta-link footer-static">Política de cookies</span>
                 </div>
                 <p class="footer-copy">© 2026 525hp. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
+    <script src="script.js"></script>
 </body>
 </html>
