@@ -29,7 +29,11 @@ function saveCart() {
 }
 
 function formatPrice(price) {
-    return `USD ${price.toLocaleString("en-US")}`;
+    return new Intl.NumberFormat("es-AR", {
+        style: "currency",
+        currency: "ARS",
+        maximumFractionDigits: 0,
+    }).format(price);
 }
 
 function getTotalItems() {
@@ -58,7 +62,7 @@ function renderCart() {
     checkoutButton.disabled = !hasItems;
 
     if (!hasItems) {
-        cartSubtotal.textContent = "USD 0";
+        cartSubtotal.textContent = "$0";
         updateCartButton();
         return;
     }
