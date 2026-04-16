@@ -220,6 +220,66 @@
         </div>
     </aside>
 
+    <div class="checkout-overlay" id="checkout-overlay" hidden></div>
+    <section class="checkout-modal" id="checkout-modal" aria-hidden="true" aria-labelledby="checkout-title">
+        <div class="checkout-modal-header">
+            <div>
+                <p class="checkout-eyebrow">525hp checkout</p>
+                <h2 id="checkout-title">Finalizar compra</h2>
+            </div>
+            <button type="button" class="checkout-close" id="checkout-close" aria-label="Cerrar checkout">×</button>
+        </div>
+
+        <div class="checkout-modal-body">
+            <form class="checkout-form" id="checkout-form">
+                <div class="checkout-grid">
+                    <label class="checkout-field">
+                        <span>Nombre completo</span>
+                        <input type="text" name="fullName" placeholder="Tu nombre" required>
+                    </label>
+                    <label class="checkout-field">
+                        <span>Email</span>
+                        <input type="email" name="email" placeholder="nombre@email.com" required>
+                    </label>
+                    <label class="checkout-field">
+                        <span>Telefono</span>
+                        <input type="tel" name="phone" placeholder="+54 9 11 1234 5678" required>
+                    </label>
+                    <label class="checkout-field">
+                        <span>Provincia</span>
+                        <input type="text" name="province" placeholder="Buenos Aires" required>
+                    </label>
+                    <label class="checkout-field checkout-field-full">
+                        <span>Direccion de entrega</span>
+                        <input type="text" name="address" placeholder="Calle, numero, piso, depto" required>
+                    </label>
+                    <label class="checkout-field checkout-field-full">
+                        <span>Notas para tu pedido</span>
+                        <textarea name="notes" rows="4" placeholder="Instrucciones de entrega, referencias, etc."></textarea>
+                    </label>
+                </div>
+
+                <div class="checkout-summary-box">
+                    <div class="checkout-summary-row">
+                        <span>Productos</span>
+                        <strong id="checkout-items-count">0</strong>
+                    </div>
+                    <div class="checkout-summary-row">
+                        <span>Total</span>
+                        <strong id="checkout-total">$0</strong>
+                    </div>
+                </div>
+
+                <div class="checkout-actions">
+                    <button type="button" class="checkout-secondary-btn" id="checkout-cancel">Cancelar</button>
+                    <button type="submit" class="checkout-primary-btn">Confirmar pedido</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <div class="cart-toast" id="cart-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
     <footer class="site-footer" id="contacto">
         <div class="container footer-content">
             <div class="footer-column footer-brand">
