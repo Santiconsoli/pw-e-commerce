@@ -9,13 +9,6 @@ const cartItems = document.getElementById("cart-items");
 const cartEmpty = document.getElementById("cart-empty");
 const cartSubtotal = document.getElementById("cart-subtotal");
 const cartToast = document.getElementById("cart-toast");
-const checkoutOverlay = document.getElementById("checkout-overlay");
-const checkoutModal = document.getElementById("checkout-modal");
-const checkoutCloseButton = document.getElementById("checkout-close");
-const checkoutCancelButton = document.getElementById("checkout-cancel");
-const checkoutForm = document.getElementById("checkout-form");
-const checkoutItemsCount = document.getElementById("checkout-items-count");
-const checkoutTotal = document.getElementById("checkout-total");
 const continueShoppingButton = document.getElementById("cart-continue");
 const clearCartButton = document.getElementById("cart-clear");
 const checkoutButton = document.getElementById("cart-checkout");
@@ -125,32 +118,6 @@ function closeCart() {
     cartToggleButton.setAttribute("aria-expanded", "false");
 }
 
-function updateCheckoutSummary() {
-    checkoutItemsCount.textContent = getTotalItems();
-    checkoutTotal.textContent = formatPrice(getSubtotal());
-}
-
-function openCheckout() {
-    if (!cart.length) {
-        showToast("Tu Garage esta vacio. Agrega un producto antes de finalizar la compra.");
-        return;
-    }
-
-    updateCheckoutSummary();
-    checkoutOverlay.hidden = false;
-    checkoutOverlay.classList.add("is-visible");
-    checkoutModal.classList.add("is-open");
-    checkoutModal.setAttribute("aria-hidden", "false");
-    closeCart();
-}
-
-function closeCheckout() {
-    checkoutOverlay.classList.remove("is-visible");
-    checkoutModal.classList.remove("is-open");
-    checkoutOverlay.hidden = true;
-    checkoutModal.setAttribute("aria-hidden", "true");
-}
-
 function showToast(message) {
     window.clearTimeout(toastTimeoutId);
     cartToast.textContent = message;
@@ -211,9 +178,6 @@ cartToggleButton.addEventListener("click", openCart);
 cartCloseButton.addEventListener("click", closeCart);
 cartOverlay.addEventListener("click", closeCart);
 continueShoppingButton.addEventListener("click", closeCart);
-checkoutCloseButton.addEventListener("click", closeCheckout);
-checkoutCancelButton.addEventListener("click", closeCheckout);
-checkoutOverlay.addEventListener("click", closeCheckout);
 
 clearCartButton.addEventListener("click", () => {
     cart = [];
@@ -221,22 +185,13 @@ clearCartButton.addEventListener("click", () => {
     renderCart();
 });
 
-checkoutButton.addEventListener("click", openCheckout);
-
-checkoutForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    if (!checkoutForm.reportValidity()) {
+checkoutButton.addEventListener("click", () => {
+    if (!cart.length) {
+        showToast("Tu Garage esta vacio. Agrega un producto antes de finalizar la compra.");
         return;
     }
 
-    const orderNumber = `525-${Date.now().toString().slice(-6)}`;
-    cart = [];
-    saveCart();
-    renderCart();
-    closeCheckout();
-    checkoutForm.reset();
-    showToast(`Pedido ${orderNumber} confirmado. Te contactaremos para coordinar la entrega.`);
+    window.location.href = "checkout.html";
 });
 
 cartItems.addEventListener("click", (event) => {
@@ -273,11 +228,6 @@ cartItems.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-        if (checkoutModal.classList.contains("is-open")) {
-            closeCheckout();
-            return;
-        }
-
         if (cartPanel.classList.contains("is-open")) {
             closeCart();
         }
@@ -285,4 +235,3 @@ document.addEventListener("keydown", (event) => {
 });
 
 renderCart();
-updateCheckoutSummary();

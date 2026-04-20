@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | 525hp</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="checkout-page">
+    <header class="main-header checkout-header">
+        <div class="container header-flex">
+            <div class="logo">
+                <a href="index.html#inicio">525<span>hp</span></a>
+            </div>
+
+            <nav class="nav-wrapper">
+                <ul class="nav-list">
+                    <li><a href="index.html#inicio" class="nav-link">Inicio</a></li>
+                    <li><a href="index.html#catalogo" class="nav-link">Catálogo</a></li>
+                    <li><a href="index.html#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <a href="index.html#catalogo" class="cart-btn">Seguir comprando</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="checkout-page-main">
+        <section class="checkout-page-hero">
+            <div class="hero-lines checkout-page-lines" aria-hidden="true">
+                <span class="hero-line hero-line-blue"></span>
+                <span class="hero-line hero-line-gold"></span>
+                <span class="hero-line hero-line-red"></span>
+            </div>
+
+            <div class="container checkout-shell">
+                <section class="checkout-stage">
+                    <div class="checkout-stage-heading">
+                        <p class="eyebrow">525hp checkout</p>
+                        <h1>Finalizá tu compra</h1>
+                        <p class="checkout-page-description">
+                            Completá tus datos para reservar tus piezas y coordinar la entrega de tu pedido.
+                        </p>
+                    </div>
+
+                    <form class="checkout-page-form" id="checkout-form">
+                        <div class="checkout-grid">
+                            <label class="checkout-field">
+                                <span>Nombre completo</span>
+                                <input type="text" name="fullName" placeholder="Tu nombre" required>
+                            </label>
+                            <label class="checkout-field">
+                                <span>Email</span>
+                                <input type="email" name="email" placeholder="nombre@email.com" required>
+                            </label>
+                            <label class="checkout-field">
+                                <span>Telefono</span>
+                                <input type="tel" name="phone" placeholder="+54 9 11 1234 5678" required>
+                            </label>
+                            <label class="checkout-field">
+                                <span>Provincia</span>
+                                <input type="text" name="province" placeholder="Buenos Aires" required>
+                            </label>
+                            <label class="checkout-field checkout-field-full">
+                                <span>Direccion de entrega</span>
+                                <input type="text" name="address" placeholder="Calle, numero, piso, depto" required>
+                            </label>
+                            <label class="checkout-field checkout-field-full">
+                                <span>Notas para tu pedido</span>
+                                <textarea name="notes" rows="4" placeholder="Instrucciones de entrega, referencias, etc."></textarea>
+                            </label>
+                        </div>
+
+                        <div class="checkout-page-actions">
+                            <a href="index.html#catalogo" class="checkout-secondary-btn checkout-link-btn">Volver al catálogo</a>
+                            <button type="submit" class="checkout-primary-btn">Confirmar pedido</button>
+                        </div>
+                    </form>
+                </section>
+
+                <aside class="checkout-summary-panel">
+                    <div class="checkout-summary-card">
+                        <p class="checkout-eyebrow">Resumen</p>
+                        <h2>Tu Garage</h2>
+                        <p class="checkout-summary-copy">Revisá los productos seleccionados antes de confirmar el pedido.</p>
+
+                        <p class="checkout-empty-page" id="checkout-empty-page">Tu Garage está vacío por ahora.</p>
+                        <ul class="checkout-order-list" id="checkout-order-list"></ul>
+
+                        <div class="checkout-summary-box">
+                            <div class="checkout-summary-row">
+                                <span>Productos</span>
+                                <strong id="checkout-items-count">0</strong>
+                            </div>
+                            <div class="checkout-summary-row">
+                                <span>Total</span>
+                                <strong id="checkout-total">$0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <div class="cart-toast" id="cart-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="checkout.js"></script>
+</body>
+</html>
