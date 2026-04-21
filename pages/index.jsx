@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { products } from '../data/products';
 
@@ -32,6 +33,27 @@ export default function Home() {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
 
+  useEffect(() => {
+    if (!isCartOpen) {
+      document.body.style.overflow = '';
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setCartOpen(false);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isCartOpen]);
+
   const totalPrice = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [cartItems]
@@ -61,7 +83,6 @@ export default function Home() {
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
-    setCartOpen(true);
     showToast(`${product.name} agregado al Garage`);
   };
 
@@ -208,7 +229,12 @@ export default function Home() {
         hidden={!isCartOpen}
         onClick={() => setCartOpen(false)}
       />
-      <aside className="cart-panel" id="cart-panel" aria-hidden={!isCartOpen} aria-labelledby="cart-title">
+      <aside
+        className={`cart-panel ${isCartOpen ? 'is-open' : ''}`}
+        id="cart-panel"
+        aria-hidden={!isCartOpen}
+        aria-labelledby="cart-title"
+      >
         <div className="cart-panel-header">
           <div>
             <p className="cart-panel-eyebrow">525hp</p>
@@ -226,14 +252,22 @@ export default function Home() {
             <ul className="cart-items" id="cart-items">
               {cartItems.map((item) => (
                 <li key={item.id} className="cart-item">
-                  <div className="cart-item-content">
-                    <strong>{item.name}</strong>
-                    <span>{item.quantity} × {formatPrice(item.price)}</span>
+                  <div className="cart-item-top">
+                    <div className="cart-item-main">
+                      <img className="cart-item-thumb" src={item.image} alt={item.name} />
+                      <div>
+                        <p className="cart-item-name">{item.name}</p>
+                        <p className="cart-item-price">{formatPrice(item.price)} c/u</p>
+                      </div>
+                    </div>
+                    <p className="cart-item-price">{formatPrice(item.price * item.quantity)}</p>
                   </div>
                   <div className="cart-item-controls">
-                    <button type="button" className="cart-qty-btn" onClick={() => handleQtyChange(item.id, -1)}>-</button>
-                    <span className="cart-qty-value">{item.quantity}</span>
-                    <button type="button" className="cart-qty-btn" onClick={() => handleQtyChange(item.id, 1)}>+</button>
+                    <div className="cart-qty-controls">
+                      <button type="button" className="cart-qty-btn" onClick={() => handleQtyChange(item.id, -1)}>-</button>
+                      <span className="cart-qty-value">{item.quantity}</span>
+                      <button type="button" className="cart-qty-btn" onClick={() => handleQtyChange(item.id, 1)}>+</button>
+                    </div>
                     <button type="button" className="cart-remove-btn" onClick={() => handleRemove(item.id)}>Quitar</button>
                   </div>
                 </li>
@@ -254,9 +288,9 @@ export default function Home() {
             <button type="button" className="cart-secondary-btn" id="cart-clear" onClick={handleClear}>
               Vaciar Garage
             </button>
-            <button type="button" className="cart-primary-btn" id="cart-checkout">
+            <Link href="/checkout" className="cart-primary-btn" id="cart-checkout" onClick={() => setCartOpen(false)}>
               Finalizar compra
-            </button>
+            </Link>
           </div>
         </div>
       </aside>
