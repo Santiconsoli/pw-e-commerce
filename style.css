@@ -1248,7 +1248,7 @@ main {
 
     .hero-description {
         max-width: none;
-        margin-bottom: 18px;
+        margin-bottom: 10px;
         font-size: 0.96rem;
         line-height: 1.7;
     }
