@@ -1248,7 +1248,7 @@ main {
 
     .hero-description {
         max-width: none;
-        margin-bottom: 10px;
+        margin-bottom: 18px;
         font-size: 0.96rem;
         line-height: 1.7;
     }
@@ -1261,7 +1261,7 @@ main {
     .hero-figure {
         flex: none;
         width: min(100%, 320px);
-        margin: -2px auto 0;
+        margin: -28px auto 0;
         aspect-ratio: 0.92 / 1;
         padding: 8px;
         border-radius: 18px;
@@ -1504,6 +1504,7 @@ main {
 
     .hero-figure {
         width: min(100%, 286px);
+        margin-top: -24px;
         aspect-ratio: 0.9 / 1;
         padding: 7px;
         border-radius: 16px;
