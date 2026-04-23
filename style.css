@@ -1210,6 +1210,14 @@ main {
         border-radius: 50%;
     }
 
+    .checkout-header .cart-btn {
+        width: auto;
+        min-width: max-content;
+        height: 44px;
+        padding: 0 16px;
+        border-radius: 999px;
+    }
+
     .cart-btn-label {
         display: none;
     }
@@ -1492,6 +1500,14 @@ main {
     .cart-btn {
         width: 42px;
         height: 42px;
+    }
+
+    .checkout-header .cart-btn {
+        width: auto;
+        min-width: max-content;
+        height: 42px;
+        padding: 0 14px;
+        font-size: 0.72rem;
     }
 
     .hero-section {
