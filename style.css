@@ -1262,7 +1262,7 @@ main {
     .hero-figure {
         flex: none;
         width: min(100%, 320px);
-        margin: -40px auto 0;
+        margin: -120px auto 0;
         aspect-ratio: 0.92 / 1;
         padding: 8px;
         border-radius: 18px;
@@ -1505,7 +1505,7 @@ main {
 
     .hero-figure {
         width: min(100%, 286px);
-        margin-top: -24px;
+        margin-top: -96px;
         aspect-ratio: 0.9 / 1;
         padding: 7px;
         border-radius: 16px;
