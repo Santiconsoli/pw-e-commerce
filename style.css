@@ -199,6 +199,7 @@ img {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-align: left;
     transition: var(--transition);
 }
 
