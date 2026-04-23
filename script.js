@@ -4,6 +4,12 @@ const cartToggleButton = document.getElementById("cart-toggle");
 const cartCloseButton = document.getElementById("cart-close");
 const cartOverlay = document.getElementById("cart-overlay");
 const cartPanel = document.getElementById("cart-panel");
+const menuToggleButton = document.getElementById("menu-toggle");
+const menuCloseButton = document.getElementById("menu-close");
+const menuOverlay = document.getElementById("menu-overlay");
+const mobileMenu = document.getElementById("mobile-menu");
+const mobileMenuLinks = document.querySelectorAll(".mobile-menu-link");
+const mobileMenuGarageButton = document.getElementById("menu-garage");
 const cartCount = document.getElementById("cart-count");
 const cartItems = document.getElementById("cart-items");
 const cartEmpty = document.getElementById("cart-empty");
@@ -101,6 +107,7 @@ function renderCart() {
 }
 
 function openCart() {
+    closeMenu();
     document.body.classList.add("cart-open");
     cartPanel.classList.add("is-open");
     cartOverlay.hidden = false;
@@ -116,6 +123,25 @@ function closeCart() {
     cartOverlay.hidden = true;
     cartPanel.setAttribute("aria-hidden", "true");
     cartToggleButton.setAttribute("aria-expanded", "false");
+}
+
+function openMenu() {
+    closeCart();
+    document.body.classList.add("menu-open");
+    mobileMenu.classList.add("is-open");
+    menuOverlay.hidden = false;
+    menuOverlay.classList.add("is-visible");
+    mobileMenu.setAttribute("aria-hidden", "false");
+    menuToggleButton.setAttribute("aria-expanded", "true");
+}
+
+function closeMenu() {
+    document.body.classList.remove("menu-open");
+    mobileMenu.classList.remove("is-open");
+    menuOverlay.classList.remove("is-visible");
+    menuOverlay.hidden = true;
+    mobileMenu.setAttribute("aria-hidden", "true");
+    menuToggleButton.setAttribute("aria-expanded", "false");
 }
 
 function showToast(message) {
@@ -178,6 +204,14 @@ cartToggleButton.addEventListener("click", openCart);
 cartCloseButton.addEventListener("click", closeCart);
 cartOverlay.addEventListener("click", closeCart);
 continueShoppingButton.addEventListener("click", closeCart);
+menuToggleButton.addEventListener("click", openMenu);
+menuCloseButton.addEventListener("click", closeMenu);
+menuOverlay.addEventListener("click", closeMenu);
+mobileMenuGarageButton.addEventListener("click", openCart);
+
+mobileMenuLinks.forEach((link) => {
+    link.addEventListener("click", closeMenu);
+});
 
 clearCartButton.addEventListener("click", () => {
     cart = [];
@@ -230,6 +264,10 @@ document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         if (cartPanel.classList.contains("is-open")) {
             closeCart();
+        }
+
+        if (mobileMenu.classList.contains("is-open")) {
+            closeMenu();
         }
     }
 });
