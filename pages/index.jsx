@@ -15,6 +15,7 @@ const formatPrice = (value) =>
 export default function Home() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setCartOpen] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastTimer, setToastTimer] = useState(null);
 
@@ -34,7 +35,7 @@ export default function Home() {
   }, [cartItems]);
 
   useEffect(() => {
-    if (!isCartOpen) {
+    if (!isCartOpen && !isMenuOpen) {
       document.body.style.overflow = '';
       return undefined;
     }
@@ -42,6 +43,7 @@ export default function Home() {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         setCartOpen(false);
+        setMenuOpen(false);
       }
     };
 
@@ -52,7 +54,7 @@ export default function Home() {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isCartOpen]);
+  }, [isCartOpen, isMenuOpen]);
 
   const totalPrice = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -125,6 +127,22 @@ export default function Home() {
 
       <header className="main-header">
         <div className="container header-flex">
+          <button
+            type="button"
+            className="menu-toggle"
+            aria-label="Abrir menú de navegación"
+            aria-controls="mobile-menu"
+            aria-expanded={isMenuOpen}
+            onClick={() => {
+              setCartOpen(false);
+              setMenuOpen(true);
+            }}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
           <div className="logo">
             <a href="#inicio">525<span>hp</span></a>
           </div>
@@ -152,11 +170,42 @@ export default function Home() {
                 <circle cx="10" cy="19" r="1.5"></circle>
                 <circle cx="18" cy="19" r="1.5"></circle>
               </svg>
-              <span>GARAGE (<span id="cart-count">{cartCount}</span>)</span>
+              <span className="cart-btn-label">GARAGE (<span id="cart-count">{cartCount}</span>)</span>
             </button>
           </div>
         </div>
       </header>
+
+      <div
+        className={`menu-overlay ${isMenuOpen ? 'is-visible' : ''}`}
+        hidden={!isMenuOpen}
+        onClick={() => setMenuOpen(false)}
+      />
+      <aside
+        className={`mobile-menu ${isMenuOpen ? 'is-open' : ''}`}
+        id="mobile-menu"
+        aria-hidden={!isMenuOpen}
+        aria-labelledby="mobile-menu-title"
+      >
+        <div className="mobile-menu-header">
+          <div>
+            <p className="cart-panel-eyebrow">525hp</p>
+            <h2 id="mobile-menu-title">Menú</h2>
+          </div>
+          <button type="button" className="menu-close" aria-label="Cerrar menú" onClick={() => setMenuOpen(false)}>
+            ×
+          </button>
+        </div>
+
+        <nav className="mobile-menu-nav" aria-label="Navegación principal">
+          <ul className="mobile-menu-list">
+            <li><a href="#inicio" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Inicio</a></li>
+            <li><a href="#catalogo" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Catálogo</a></li>
+            <li><a href="#nosotros" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Nosotros</a></li>
+            <li><a href="#contacto" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Contacto</a></li>
+          </ul>
+        </nav>
+      </aside>
 
       <main>
         <section className="hero-section" id="inicio">
