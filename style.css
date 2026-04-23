@@ -151,7 +151,9 @@ img {
     background: #0b0b0b;
     border-right: 1px solid #1a1a1a;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    touch-action: pan-y;
     transform: translateX(-100%);
     transition: transform 0.35s ease;
     z-index: 1200;
@@ -787,6 +789,7 @@ main {
     padding: 24px;
     background-color: #0b0b0b;
     border-left: 1px solid #1a1a1a;
+    overflow: hidden;
     transform: translateX(100%);
     transition: transform 0.35s ease;
     z-index: 1200;
@@ -830,6 +833,9 @@ main {
     flex: 1;
     padding: 20px 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
 }
 
 .cart-empty {
@@ -1218,7 +1224,7 @@ main {
         min-height: auto;
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 4px;
     }
 
     .hero-copy {
@@ -1242,7 +1248,7 @@ main {
 
     .hero-description {
         max-width: none;
-        margin-bottom: 24px;
+        margin-bottom: 18px;
         font-size: 0.96rem;
         line-height: 1.7;
     }
@@ -1255,7 +1261,7 @@ main {
     .hero-figure {
         flex: none;
         width: min(100%, 320px);
-        margin: 4px auto 0;
+        margin: -2px auto 0;
         aspect-ratio: 0.92 / 1;
         padding: 8px;
         border-radius: 18px;
@@ -1399,6 +1405,7 @@ main {
         width: 100%;
         padding: 18px 16px calc(24px + env(safe-area-inset-bottom, 0px));
         border-left: 0;
+        overscroll-behavior: contain;
     }
 
     .cart-panel-body {
