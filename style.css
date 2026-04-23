@@ -831,7 +831,7 @@ main {
 
 .cart-panel-body {
     flex: 1;
-    padding: 20px 0;
+    padding: 20px 0 196px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
@@ -938,6 +938,9 @@ main {
     padding-top: 20px;
     border-top: 1px solid #1a1a1a;
     background: linear-gradient(180deg, rgba(11, 11, 11, 0.78) 0%, #0b0b0b 24%);
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(10px);
 }
 
 .cart-summary {
@@ -1410,7 +1413,7 @@ main {
     }
 
     .cart-panel-body {
-        padding: 16px 0 24px;
+        padding: 16px 0 220px;
     }
 
     .cart-panel-footer {
