@@ -705,8 +705,8 @@ main {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.06), transparent 30%),
-        linear-gradient(90deg, rgba(5, 5, 5, 0.98) 0%, rgba(5, 5, 5, 0.62) 24%, rgba(5, 5, 5, 0) 48%);
+        radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.05), transparent 28%),
+        linear-gradient(90deg, rgba(5, 5, 5, 0.28) 0%, rgba(5, 5, 5, 0.08) 22%, rgba(5, 5, 5, 0) 42%);
     z-index: 1;
     pointer-events: none;
 }
@@ -716,8 +716,8 @@ main {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(180deg, rgba(5, 5, 5, 0.16) 0%, rgba(5, 5, 5, 0) 22%, rgba(5, 5, 5, 0) 78%, rgba(5, 5, 5, 0.42) 100%),
-        linear-gradient(270deg, rgba(5, 5, 5, 0) 62%, rgba(5, 5, 5, 0.38) 100%);
+        linear-gradient(180deg, rgba(5, 5, 5, 0.08) 0%, rgba(5, 5, 5, 0) 20%, rgba(5, 5, 5, 0) 76%, rgba(5, 5, 5, 0.22) 100%),
+        linear-gradient(270deg, rgba(5, 5, 5, 0) 68%, rgba(5, 5, 5, 0.18) 100%);
     z-index: 3;
     pointer-events: none;
 }
@@ -728,9 +728,7 @@ main {
     width: 132%;
     max-width: none;
     transform: translateX(14%) translateY(2%);
-    filter: drop-shadow(0 28px 48px rgba(0, 0, 0, 0.42));
-    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.78) 14%, #000 28%, #000 100%);
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.78) 14%, #000 28%, #000 100%);
+    filter: drop-shadow(0 28px 46px rgba(0, 0, 0, 0.46));
 }
 
 .collection-section {
@@ -1771,14 +1769,12 @@ main {
 
     .hero-cars-single::before {
         background:
-            linear-gradient(90deg, rgba(5, 5, 5, 0.98) 0%, rgba(5, 5, 5, 0.56) 28%, rgba(5, 5, 5, 0) 56%);
+            linear-gradient(90deg, rgba(5, 5, 5, 0.22) 0%, rgba(5, 5, 5, 0.08) 28%, rgba(5, 5, 5, 0) 56%);
     }
 
     .hero-cars-single img {
         width: 145%;
         transform: translateX(16%) translateY(4%);
-        mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.72) 12%, #000 25%, #000 100%);
-        -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.72) 12%, #000 25%, #000 100%);
     }
 
     .hero-line {
