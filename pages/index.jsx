@@ -158,7 +158,7 @@ export default function Home() {
             </div>
 
             <figure className="hero-cars hero-cars-stack" aria-label="McLaren, Porsche y Ferrari destacados">
-              <img className="hero-car hero-car-top" src="/assets/hero/mpng.png" alt="McLaren negro lateral" />
+              <img className="hero-car hero-car-top" src="/assets/hero/m2png.png" alt="McLaren negro lateral" />
               <img className="hero-car hero-car-middle" src="/assets/hero/ppng.png" alt="Porsche blanco lateral" />
               <img className="hero-car hero-car-bottom" src="/assets/hero/fpng.png" alt="Ferrari rojo lateral" />
             </figure>

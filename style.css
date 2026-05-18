@@ -707,20 +707,20 @@ main {
 }
 
 .hero-car-top {
-    top: 2%;
-    width: 104%;
+    top: 0;
+    width: 100%;
     z-index: 3;
 }
 
 .hero-car-middle {
-    top: 32%;
-    width: 108%;
+    top: 38%;
+    width: 104%;
     z-index: 2;
 }
 
 .hero-car-bottom {
-    top: 64%;
-    width: 110%;
+    top: 76%;
+    width: 104%;
     z-index: 1;
 }
 
@@ -1772,17 +1772,17 @@ main {
 
     .hero-car-top {
         top: 0;
-        width: 116%;
+        width: 110%;
     }
 
     .hero-car-middle {
-        top: 32%;
-        width: 118%;
+        top: 38%;
+        width: 112%;
     }
 
     .hero-car-bottom {
-        top: 66%;
-        width: 120%;
+        top: 77%;
+        width: 112%;
     }
 
     .hero-line {
@@ -2087,17 +2087,17 @@ main {
     }
 
     .hero-car-top {
-        width: 122%;
+        width: 116%;
     }
 
     .hero-car-middle {
-        top: 33%;
-        width: 124%;
+        top: 39%;
+        width: 118%;
     }
 
     .hero-car-bottom {
-        top: 67%;
-        width: 126%;
+        top: 78%;
+        width: 118%;
     }
 
     .section-heading h2 {
