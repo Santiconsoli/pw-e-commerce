@@ -678,25 +678,60 @@ main {
     background-color: #d7d7d7;
 }
 
-.hero-figure {
+.hero-cars {
     position: relative;
-    flex: 0 1 450px;
-    width: min(100%, 450px);
-    aspect-ratio: 1 / 1;
-    padding: 14px;
-    border: 1px solid #1a1a1a;
-    border-radius: 22px;
-    background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent 55%),
-        #0a0a0a;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    flex: 0 1 520px;
+    width: min(100%, 520px);
+    height: 620px;
+    margin-right: -10%;
+    pointer-events: none;
 }
 
-.hero-figure img {
+.hero-car {
+    position: absolute;
+    right: -18%;
+    width: 128%;
+    filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.38));
+}
+
+.hero-car img {
+    display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 16px;
+    height: auto;
+}
+
+.hero-car-amg {
+    top: 8%;
+    z-index: 1;
+    opacity: 0.7;
+    mix-blend-mode: screen;
+}
+
+.hero-car-amg img {
+    clip-path: inset(18% 0 20% 0);
+    filter: saturate(0.9) brightness(1.04) contrast(1.08);
+}
+
+.hero-car-mclaren {
+    top: 28%;
+    z-index: 3;
+    transform: translateX(3%);
+}
+
+.hero-car-mclaren img {
+    mix-blend-mode: multiply;
+    filter: contrast(1.06) saturate(0.9);
+}
+
+.hero-car-porsche {
+    top: 48%;
+    z-index: 2;
+    transform: translateX(-3%);
+}
+
+.hero-car-porsche img {
+    mix-blend-mode: multiply;
+    filter: contrast(1.04) brightness(0.97);
 }
 
 .collection-section {
@@ -1727,17 +1762,34 @@ main {
         min-height: 50px;
     }
 
-    .hero-figure {
+    .hero-cars {
         flex: none;
-        width: min(100%, 320px);
-        margin: -120px auto 0;
-        aspect-ratio: 0.92 / 1;
-        padding: 8px;
-        border-radius: 18px;
+        width: min(100%, 420px);
+        height: 350px;
+        margin: -86px auto 0;
+        overflow: visible;
     }
 
-    .hero-figure img {
-        border-radius: 12px;
+    .hero-car {
+        right: -22%;
+        width: 140%;
+    }
+
+    .hero-car-amg {
+        top: 4%;
+    }
+
+    .hero-car-amg img {
+        clip-path: inset(24% 0 23% 0);
+    }
+
+    .hero-car-mclaren {
+        top: 29%;
+        transform: translateX(2%);
+    }
+
+    .hero-car-porsche {
+        top: 54%;
     }
 
     .hero-line {
@@ -2031,12 +2083,27 @@ main {
         font-size: 0.92rem;
     }
 
-    .hero-figure {
-        width: min(100%, 286px);
+    .hero-cars {
+        width: min(100%, 330px);
+        height: 290px;
         margin-top: -96px;
-        aspect-ratio: 0.9 / 1;
-        padding: 7px;
-        border-radius: 16px;
+    }
+
+    .hero-car {
+        right: -28%;
+        width: 150%;
+    }
+
+    .hero-car-amg {
+        top: 0;
+    }
+
+    .hero-car-mclaren {
+        top: 31%;
+    }
+
+    .hero-car-porsche {
+        top: 58%;
     }
 
     .section-heading h2 {

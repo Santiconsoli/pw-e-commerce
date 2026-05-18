@@ -157,9 +157,17 @@ export default function Home() {
               <a href="#catalogo" className="hero-cta">Explorar colección</a>
             </div>
 
-            <figure className="hero-figure" aria-label="Mesa BMW destacada">
-              <img src="/assets/productos/mesa-bmw.png" alt="Mesa BMW en acabado oscuro" />
-            </figure>
+            <div className="hero-cars" aria-label="Colección de autos destacados">
+              <figure className="hero-car hero-car-amg">
+                <img src="/assets/hero/amgt63.jpg" alt="Mercedes-AMG GT63 lateral" />
+              </figure>
+              <figure className="hero-car hero-car-mclaren">
+                <img src="/assets/hero/mclarenside.webp" alt="McLaren lateral" />
+              </figure>
+              <figure className="hero-car hero-car-porsche">
+                <img src="/assets/hero/porschegt3side.jpg" alt="Porsche GT3 RS lateral" />
+              </figure>
+            </div>
           </div>
         </section>
 
