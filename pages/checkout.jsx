@@ -1,6 +1,6 @@
 import Head from 'next/head';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import Header from '../components/Header';
 
 const CART_STORAGE_KEY = '525hp-cart';
 
@@ -95,25 +95,7 @@ export default function CheckoutPage() {
       </Head>
 
       <div className="checkout-page">
-        <header className="main-header checkout-header">
-          <div className="container header-flex">
-            <div className="logo">
-              <Link href="/#inicio">525<span>hp</span></Link>
-            </div>
-
-            <nav className="nav-wrapper">
-              <ul className="nav-list">
-                <li><Link href="/#inicio" className="nav-link">Inicio</Link></li>
-                <li><Link href="/#catalogo" className="nav-link">Catálogo</Link></li>
-                <li><Link href="/#contacto" className="nav-link">Contacto</Link></li>
-              </ul>
-            </nav>
-
-            <div className="header-actions">
-              <Link href="/#catalogo" className="cart-btn">Seguir comprando</Link>
-            </div>
-          </div>
-        </header>
+        <Header checkout />
 
         <main className="checkout-page-main">
           <section className="checkout-page-hero">
@@ -162,7 +144,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="checkout-page-actions">
-                    <Link href="/#catalogo" className="checkout-secondary-btn checkout-link-btn">Volver al catálogo</Link>
+                    <a href="/#catalogo" className="checkout-secondary-btn checkout-link-btn">Volver al catálogo</a>
                     <button type="submit" className="checkout-primary-btn" disabled={!cartItems.length}>Confirmar pedido</button>
                   </div>
                 </form>

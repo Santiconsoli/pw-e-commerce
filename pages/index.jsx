@@ -1,6 +1,9 @@
 import Head from 'next/head';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import CartPanel from '../components/CartPanel';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import ProductCard from '../components/ProductCard';
 import { products } from '../data/products';
 
 const CART_STORAGE_KEY = '525hp-cart';
@@ -125,87 +128,17 @@ export default function Home() {
         />
       </Head>
 
-      <header className="main-header">
-        <div className="container header-flex">
-          <button
-            type="button"
-            className="menu-toggle"
-            aria-label="Abrir menú de navegación"
-            aria-controls="mobile-menu"
-            aria-expanded={isMenuOpen}
-            onClick={() => {
-              setCartOpen(false);
-              setMenuOpen(true);
-            }}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-
-          <div className="logo">
-            <a href="#inicio">525<span>hp</span></a>
-          </div>
-
-          <nav className="nav-wrapper">
-            <ul className="nav-list">
-              <li><a href="#inicio" className="nav-link">Inicio</a></li>
-              <li><a href="#catalogo" className="nav-link">Catálogo</a></li>
-              <li><a href="#nosotros" className="nav-link">Nosotros</a></li>
-              <li><a href="#contacto" className="nav-link">Contacto</a></li>
-            </ul>
-          </nav>
-
-          <div className="header-actions">
-            <button
-              type="button"
-              className="cart-btn"
-              onClick={() => setCartOpen(true)}
-              aria-label={`Abrir carrito de compras con ${cartCount} producto${cartCount === 1 ? '' : 's'}`}
-              aria-controls="cart-panel"
-              aria-expanded={isCartOpen}
-            >
-              <svg className="cart-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M3 4h2l2.2 9.2A2 2 0 0 0 9.15 15H18a2 2 0 0 0 1.94-1.5L21 8H7.1"></path>
-                <circle cx="10" cy="19" r="1.5"></circle>
-                <circle cx="18" cy="19" r="1.5"></circle>
-              </svg>
-              <span className="cart-btn-label">GARAGE (<span id="cart-count">{cartCount}</span>)</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div
-        className={`menu-overlay ${isMenuOpen ? 'is-visible' : ''}`}
-        hidden={!isMenuOpen}
-        onClick={() => setMenuOpen(false)}
+      <Header
+        cartCount={cartCount}
+        isCartOpen={isCartOpen}
+        isMenuOpen={isMenuOpen}
+        onOpenCart={() => setCartOpen(true)}
+        onOpenMenu={() => {
+          setCartOpen(false);
+          setMenuOpen(true);
+        }}
+        onCloseMenu={() => setMenuOpen(false)}
       />
-      <aside
-        className={`mobile-menu ${isMenuOpen ? 'is-open' : ''}`}
-        id="mobile-menu"
-        aria-hidden={!isMenuOpen}
-        aria-labelledby="mobile-menu-title"
-      >
-        <div className="mobile-menu-header">
-          <div>
-            <p className="cart-panel-eyebrow">525hp</p>
-            <h2 id="mobile-menu-title">Menú</h2>
-          </div>
-          <button type="button" className="menu-close" aria-label="Cerrar menú" onClick={() => setMenuOpen(false)}>
-            ×
-          </button>
-        </div>
-
-        <nav className="mobile-menu-nav" aria-label="Navegación principal">
-          <ul className="mobile-menu-list">
-            <li><a href="#inicio" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Inicio</a></li>
-            <li><a href="#catalogo" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Catálogo</a></li>
-            <li><a href="#nosotros" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Nosotros</a></li>
-            <li><a href="#contacto" className="mobile-menu-link" onClick={() => setMenuOpen(false)}>Contacto</a></li>
-          </ul>
-        </nav>
-      </aside>
 
       <main>
         <section className="hero-section" id="inicio">
@@ -239,18 +172,7 @@ export default function Home() {
 
             <div className="product-grid">
               {products.map((product) => (
-                <article key={product.id} className="product-card">
-                  <figure className="product-media">
-                    <img src={product.image} alt={product.alt} />
-                  </figure>
-                  <div className="product-info">
-                    <h3>{product.name}</h3>
-                    <p className="price">{formatPrice(product.price)}</p>
-                    <button type="button" className="btn-add" onClick={() => handleAdd(product)}>
-                      AÑADIR AL GARAGE
-                    </button>
-                  </div>
-                </article>
+                <ProductCard key={product.id} product={product} formatPrice={formatPrice} onAdd={handleAdd} />
               ))}
             </div>
 
@@ -272,77 +194,16 @@ export default function Home() {
         </section>
       </main>
 
-      <div
-        className={`cart-overlay ${isCartOpen ? 'is-visible' : ''}`}
-        id="cart-overlay"
-        hidden={!isCartOpen}
-        onClick={() => setCartOpen(false)}
+      <CartPanel
+        isOpen={isCartOpen}
+        cartItems={cartItems}
+        totalPrice={totalPrice}
+        formatPrice={formatPrice}
+        onClose={() => setCartOpen(false)}
+        onQtyChange={handleQtyChange}
+        onRemove={handleRemove}
+        onClear={handleClear}
       />
-      <aside
-        className={`cart-panel ${isCartOpen ? 'is-open' : ''}`}
-        id="cart-panel"
-        aria-hidden={!isCartOpen}
-        aria-labelledby="cart-title"
-      >
-        <div className="cart-panel-header">
-          <div>
-            <p className="cart-panel-eyebrow">525hp</p>
-            <h2 id="cart-title">Tu Garage</h2>
-          </div>
-          <button type="button" className="cart-close" id="cart-close" aria-label="Cerrar carrito" onClick={() => setCartOpen(false)}>
-            ×
-          </button>
-        </div>
-
-        <div className="cart-panel-body">
-          {cartItems.length === 0 ? (
-            <p className="cart-empty" id="cart-empty">A tu Garage le falta vida.</p>
-          ) : (
-            <ul className="cart-items" id="cart-items">
-              {cartItems.map((item) => (
-                <li key={item.id} className="cart-item">
-                  <div className="cart-item-top">
-                    <div className="cart-item-main">
-                      <img className="cart-item-thumb" src={item.image} alt={item.name} />
-                      <div>
-                        <p className="cart-item-name">{item.name}</p>
-                        <p className="cart-item-price">{formatPrice(item.price)} c/u</p>
-                      </div>
-                    </div>
-                    <p className="cart-item-price">{formatPrice(item.price * item.quantity)}</p>
-                  </div>
-                  <div className="cart-item-controls">
-                    <div className="cart-qty-controls">
-                      <button type="button" className="cart-qty-btn" onClick={() => handleQtyChange(item.id, -1)}>-</button>
-                      <span className="cart-qty-value">{item.quantity}</span>
-                      <button type="button" className="cart-qty-btn" onClick={() => handleQtyChange(item.id, 1)}>+</button>
-                    </div>
-                    <button type="button" className="cart-remove-btn" onClick={() => handleRemove(item.id)}>Quitar</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="cart-panel-footer">
-          <div className="cart-summary">
-            <span>Subtotal</span>
-            <strong id="cart-subtotal">{formatPrice(totalPrice)}</strong>
-          </div>
-          <div className="cart-actions">
-            <button type="button" className="cart-secondary-btn" id="cart-continue" onClick={() => setCartOpen(false)}>
-              Seguir comprando
-            </button>
-            <button type="button" className="cart-secondary-btn" id="cart-clear" onClick={handleClear}>
-              Vaciar Garage
-            </button>
-            <Link href="/checkout" className="cart-primary-btn" id="cart-checkout" onClick={() => setCartOpen(false)}>
-              Finalizar compra
-            </Link>
-          </div>
-        </div>
-      </aside>
 
       {toastMessage && (
         <div className="cart-toast" id="cart-toast" role="status" aria-live="polite" aria-atomic="true">
@@ -350,83 +211,7 @@ export default function Home() {
         </div>
       )}
 
-      <footer className="site-footer" id="contacto">
-        <div className="container footer-content">
-          <div className="footer-column footer-brand">
-            <span className="footer-logo">525<span>hp</span></span>
-            <p className="footer-description">
-              Muebles y artículos de lujo creados a partir de piezas automotrices icónicas, con una presencia sobria,
-              técnica y contemporánea.
-            </p>
-          </div>
-
-          <div className="footer-column">
-            <h2 className="footer-title">Enlaces rápidos</h2>
-            <ul className="footer-list">
-              <li><span className="footer-link footer-static">Inicio</span></li>
-              <li><span className="footer-link footer-static">Catálogo</span></li>
-              <li><span className="footer-link footer-static">Nosotros</span></li>
-              <li><span className="footer-link footer-static">Contacto</span></li>
-            </ul>
-          </div>
-
-          <div className="footer-column">
-            <h2 className="footer-title">Redes sociales</h2>
-            <ul className="footer-list">
-              <li>
-                <span className="footer-link social-link footer-static" aria-label="Instagram de 525hp">
-                  <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <rect x="3" y="3" width="18" height="18" rx="5"></rect>
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <circle cx="17.5" cy="6.5" r="1"></circle>
-                  </svg>
-                  <span>Instagram</span>
-                </span>
-              </li>
-              <li>
-                <span className="footer-link social-link footer-static" aria-label="Facebook de 525hp">
-                  <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M14 8h3V4h-3a5 5 0 0 0-5 5v3H6v4h3v4h4v-4h3.2l.8-4H13V9a1 1 0 0 1 1-1Z"></path>
-                  </svg>
-                  <span>Facebook</span>
-                </span>
-              </li>
-              <li>
-                <span className="footer-link social-link footer-static" aria-label="LinkedIn de 525hp">
-                  <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <rect x="4" y="9" width="4" height="11"></rect>
-                    <circle cx="6" cy="5.5" r="2"></circle>
-                    <path d="M11 9h4v1.8c.7-1.1 1.9-2.1 4-2.1 3.1 0 4 2.1 4 5.3V20h-4v-5.1c0-1.5-.3-2.7-1.9-2.7-1.6 0-2.1 1.1-2.1 2.7V20h-4Z"></path>
-                  </svg>
-                  <span>LinkedIn</span>
-                </span>
-              </li>
-              <li>
-                <span className="footer-link social-link footer-static" aria-label="WhatsApp de 525hp">
-                  <svg className="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M12 21a8.9 8.9 0 0 1-4.5-1.2L3 21l1.3-4.3A9 9 0 1 1 12 21Z"></path>
-                    <path d="M9.1 7.8c.2-.4.4-.5.7-.5h.6c.2 0 .4 0 .6.5l.6 1.5c.1.3.1.5-.1.7l-.5.6c-.1.1-.2.3-.1.5.3.6.8 1.2 1.4 1.8.7.6 1.4 1 2.1 1.3.2.1.4 0 .5-.1l.7-.8c.2-.2.4-.2.7-.1l1.4.7c.3.1.5.3.4.6l-.2.9c-.1.3-.3.6-.6.7-.5.2-1.2.2-1.9 0-1.1-.3-2.3-.9-3.5-1.9-1.1-.9-2-2.1-2.5-3.3-.4-.8-.5-1.5-.3-2.1Z"></path>
-                  </svg>
-                  <span>WhatsApp</span>
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <div className="container">
-            <div className="footer-meta">
-              <span className="footer-meta-item">AR | Argentina 🇦🇷</span>
-              <span className="footer-meta-item">Idioma | Español</span>
-              <span className="footer-meta-link footer-static">Términos y Condiciones del sitio web</span>
-              <span className="footer-meta-link footer-static">Privacidad</span>
-              <span className="footer-meta-link footer-static">Política de cookies</span>
-            </div>
-            <p className="footer-copy">© 2026 525hp. Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }
