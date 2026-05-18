@@ -3,98 +3,116 @@ export default function SkeletonScreen() {
     <div className="skeleton-screen" aria-hidden="true">
       <div className="skeleton-shell">
         <header className="skeleton-header">
-          <div className="skeleton-topbar">
-            <span className="skeleton-status skeleton-status-time"></span>
-            <div className="skeleton-status-group">
-              <span className="skeleton-status skeleton-status-signal"></span>
-              <span className="skeleton-status skeleton-status-wifi"></span>
-              <span className="skeleton-status skeleton-status-battery"></span>
-            </div>
-          </div>
-
-          <div className="skeleton-toolbar">
-            <span className="skeleton-avatar skeleton-block"></span>
-            <span className="skeleton-search skeleton-block"></span>
-            <span className="skeleton-icon skeleton-block"></span>
+          <div className="skeleton-header-bar">
+            <span className="skeleton-menu-btn skeleton-block"></span>
+            <span className="skeleton-logo skeleton-block"></span>
+            <span className="skeleton-cart-btn skeleton-block"></span>
           </div>
         </header>
 
-        <main className="skeleton-feed">
-          <section className="skeleton-card">
-            <div className="skeleton-card-head">
-              <span className="skeleton-avatar skeleton-block"></span>
-              <div className="skeleton-card-copy">
-                <span className="skeleton-line skeleton-block skeleton-line-lg"></span>
-                <span className="skeleton-line skeleton-block skeleton-line-md"></span>
-                <span className="skeleton-line skeleton-block skeleton-line-sm"></span>
-              </div>
+        <main className="skeleton-main">
+          <section className="skeleton-hero">
+            <div className="skeleton-hero-lines" aria-hidden="true">
+              <span className="skeleton-hero-line skeleton-hero-line-blue"></span>
+              <span className="skeleton-hero-line skeleton-hero-line-gold"></span>
+              <span className="skeleton-hero-line skeleton-hero-line-red"></span>
             </div>
 
-            <div className="skeleton-text-group">
-              <span className="skeleton-line skeleton-block skeleton-line-full"></span>
-              <span className="skeleton-line skeleton-block skeleton-line-xl"></span>
-              <span className="skeleton-line skeleton-block skeleton-line-lg"></span>
-              <span className="skeleton-line skeleton-block skeleton-line-md"></span>
-            </div>
+            <div className="skeleton-hero-layout">
+              <div className="skeleton-hero-copy">
+                <span className="skeleton-kicker skeleton-block"></span>
+                <span className="skeleton-title skeleton-block skeleton-title-1"></span>
+                <span className="skeleton-title skeleton-block skeleton-title-2"></span>
+                <span className="skeleton-title skeleton-block skeleton-title-3"></span>
 
-            <div className="skeleton-meta-row">
-              <div className="skeleton-dots">
-                <span className="skeleton-dot skeleton-block"></span>
-                <span className="skeleton-dot skeleton-block"></span>
-                <span className="skeleton-dot skeleton-block"></span>
-                <span className="skeleton-dot skeleton-block"></span>
+                <div className="skeleton-copy-group">
+                  <span className="skeleton-line skeleton-block skeleton-line-lg"></span>
+                  <span className="skeleton-line skeleton-block skeleton-line-md"></span>
+                  <span className="skeleton-line skeleton-block skeleton-line-sm"></span>
+                </div>
+
+                <span className="skeleton-cta skeleton-block"></span>
               </div>
-              <span className="skeleton-pill skeleton-block"></span>
+
+              <div className="skeleton-hero-media">
+                <span className="skeleton-hero-image skeleton-block"></span>
+              </div>
             </div>
           </section>
 
-          <section className="skeleton-card">
-            <div className="skeleton-card-head">
-              <span className="skeleton-avatar skeleton-block"></span>
-              <div className="skeleton-card-copy">
-                <span className="skeleton-line skeleton-block skeleton-line-lg"></span>
-                <span className="skeleton-line skeleton-block skeleton-line-md"></span>
-                <span className="skeleton-line skeleton-block skeleton-line-sm"></span>
-              </div>
+          <section className="skeleton-collection">
+            <div className="skeleton-section-head">
+              <span className="skeleton-kicker skeleton-block"></span>
+              <span className="skeleton-section-title skeleton-block"></span>
             </div>
 
-            <div className="skeleton-media skeleton-block"></div>
+            <div className="skeleton-product-grid">
+              <article className="skeleton-product-card">
+                <span className="skeleton-product-media skeleton-block"></span>
+                <div className="skeleton-product-copy">
+                  <span className="skeleton-line skeleton-block skeleton-line-md"></span>
+                  <span className="skeleton-line skeleton-block skeleton-line-xs"></span>
+                  <span className="skeleton-product-btn skeleton-block"></span>
+                </div>
+              </article>
 
-            <div className="skeleton-meta-row">
-              <div className="skeleton-dots">
-                <span className="skeleton-dot skeleton-block"></span>
-                <span className="skeleton-dot skeleton-block"></span>
-                <span className="skeleton-dot skeleton-block"></span>
-                <span className="skeleton-dot skeleton-block"></span>
-              </div>
-              <span className="skeleton-pill skeleton-block"></span>
+              <article className="skeleton-product-card">
+                <span className="skeleton-product-media skeleton-block"></span>
+                <div className="skeleton-product-copy">
+                  <span className="skeleton-line skeleton-block skeleton-line-md"></span>
+                  <span className="skeleton-line skeleton-block skeleton-line-xs"></span>
+                  <span className="skeleton-product-btn skeleton-block"></span>
+                </div>
+              </article>
+
+              <article className="skeleton-product-card skeleton-product-card-desktop">
+                <span className="skeleton-product-media skeleton-block"></span>
+                <div className="skeleton-product-copy">
+                  <span className="skeleton-line skeleton-block skeleton-line-md"></span>
+                  <span className="skeleton-line skeleton-block skeleton-line-xs"></span>
+                  <span className="skeleton-product-btn skeleton-block"></span>
+                </div>
+              </article>
+
+              <article className="skeleton-product-card skeleton-product-card-desktop">
+                <span className="skeleton-product-media skeleton-block"></span>
+                <div className="skeleton-product-copy">
+                  <span className="skeleton-line skeleton-block skeleton-line-md"></span>
+                  <span className="skeleton-line skeleton-block skeleton-line-xs"></span>
+                  <span className="skeleton-product-btn skeleton-block"></span>
+                </div>
+              </article>
             </div>
-          </section>
 
-          <section className="skeleton-card skeleton-card-desktop">
-            <div className="skeleton-card-head">
-              <span className="skeleton-avatar skeleton-block"></span>
-              <div className="skeleton-card-copy">
-                <span className="skeleton-line skeleton-block skeleton-line-lg"></span>
-                <span className="skeleton-line skeleton-block skeleton-line-md"></span>
-                <span className="skeleton-line skeleton-block skeleton-line-sm"></span>
-              </div>
-            </div>
-
-            <div className="skeleton-grid">
-              <span className="skeleton-product skeleton-block"></span>
-              <span className="skeleton-product skeleton-block"></span>
-              <span className="skeleton-product skeleton-block"></span>
+            <div className="skeleton-brand-strip">
+              <span className="skeleton-brand skeleton-block"></span>
+              <span className="skeleton-brand skeleton-block"></span>
+              <span className="skeleton-brand skeleton-block"></span>
+              <span className="skeleton-brand skeleton-block"></span>
             </div>
           </section>
         </main>
 
-        <footer className="skeleton-bottom-nav">
-          <span className="skeleton-nav-item skeleton-block"></span>
-          <span className="skeleton-nav-item skeleton-block"></span>
-          <span className="skeleton-nav-item skeleton-block"></span>
-          <span className="skeleton-nav-item skeleton-block"></span>
-          <span className="skeleton-nav-item skeleton-block"></span>
+        <footer className="skeleton-footer">
+          <div className="skeleton-footer-grid">
+            <div className="skeleton-footer-col">
+              <span className="skeleton-footer-logo skeleton-block"></span>
+              <span className="skeleton-line skeleton-block skeleton-line-lg"></span>
+              <span className="skeleton-line skeleton-block skeleton-line-md"></span>
+            </div>
+            <div className="skeleton-footer-col skeleton-footer-col-desktop">
+              <span className="skeleton-footer-title skeleton-block"></span>
+              <span className="skeleton-footer-link skeleton-block"></span>
+              <span className="skeleton-footer-link skeleton-block"></span>
+              <span className="skeleton-footer-link skeleton-block"></span>
+            </div>
+            <div className="skeleton-footer-col skeleton-footer-col-desktop">
+              <span className="skeleton-footer-title skeleton-block"></span>
+              <span className="skeleton-footer-link skeleton-block"></span>
+              <span className="skeleton-footer-link skeleton-block"></span>
+              <span className="skeleton-footer-link skeleton-block"></span>
+            </div>
+          </div>
         </footer>
       </div>
     </div>
