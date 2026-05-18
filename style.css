@@ -680,10 +680,10 @@ main {
 
 .hero-cars {
     position: relative;
-    flex: 0 1 520px;
-    width: min(100%, 520px);
-    height: 620px;
-    margin-right: -10%;
+    flex: 0 1 620px;
+    width: min(100%, 620px);
+    height: 700px;
+    margin-right: -16%;
     pointer-events: none;
 }
 
@@ -705,8 +705,7 @@ main {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.05), transparent 28%),
-        linear-gradient(90deg, rgba(5, 5, 5, 0.28) 0%, rgba(5, 5, 5, 0.08) 22%, rgba(5, 5, 5, 0) 42%);
+        linear-gradient(90deg, rgba(5, 5, 5, 0.46) 0%, rgba(5, 5, 5, 0.14) 20%, rgba(5, 5, 5, 0) 40%);
     z-index: 1;
     pointer-events: none;
 }
@@ -716,8 +715,8 @@ main {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(180deg, rgba(5, 5, 5, 0.08) 0%, rgba(5, 5, 5, 0) 20%, rgba(5, 5, 5, 0) 76%, rgba(5, 5, 5, 0.22) 100%),
-        linear-gradient(270deg, rgba(5, 5, 5, 0) 68%, rgba(5, 5, 5, 0.18) 100%);
+        linear-gradient(180deg, rgba(5, 5, 5, 0.04) 0%, rgba(5, 5, 5, 0) 18%, rgba(5, 5, 5, 0) 78%, rgba(5, 5, 5, 0.18) 100%),
+        linear-gradient(270deg, rgba(5, 5, 5, 0) 72%, rgba(5, 5, 5, 0.12) 100%);
     z-index: 3;
     pointer-events: none;
 }
@@ -725,10 +724,10 @@ main {
 .hero-cars-single img {
     position: relative;
     z-index: 2;
-    width: 132%;
+    width: 154%;
     max-width: none;
-    transform: translateX(14%) translateY(2%);
-    filter: drop-shadow(0 28px 46px rgba(0, 0, 0, 0.46));
+    transform: translateX(18%) translateY(0%);
+    filter: drop-shadow(0 32px 54px rgba(0, 0, 0, 0.52));
 }
 
 .collection-section {
@@ -1761,20 +1760,20 @@ main {
 
     .hero-cars {
         flex: none;
-        width: min(100%, 420px);
-        height: 300px;
-        margin: -62px auto 0;
+        width: min(100%, 470px);
+        height: 326px;
+        margin: -68px auto 0;
         overflow: visible;
     }
 
     .hero-cars-single::before {
         background:
-            linear-gradient(90deg, rgba(5, 5, 5, 0.22) 0%, rgba(5, 5, 5, 0.08) 28%, rgba(5, 5, 5, 0) 56%);
+            linear-gradient(90deg, rgba(5, 5, 5, 0.34) 0%, rgba(5, 5, 5, 0.1) 28%, rgba(5, 5, 5, 0) 56%);
     }
 
     .hero-cars-single img {
-        width: 145%;
-        transform: translateX(16%) translateY(4%);
+        width: 164%;
+        transform: translateX(18%) translateY(4%);
     }
 
     .hero-line {
@@ -2069,14 +2068,14 @@ main {
     }
 
     .hero-cars {
-        width: min(100%, 330px);
-        height: 248px;
+        width: min(100%, 360px);
+        height: 262px;
         margin-top: -84px;
     }
 
     .hero-cars-single img {
-        width: 156%;
-        transform: translateX(18%) translateY(5%);
+        width: 172%;
+        transform: translateX(20%) translateY(6%);
     }
 
     .section-heading h2 {

@@ -158,7 +158,7 @@ export default function Home() {
             </div>
 
             <figure className="hero-cars hero-cars-single" aria-label="Porsche, McLaren y Mercedes-AMG destacados">
-              <img src="/assets/hero/hero-cars-stack-v2-black.png" alt="Porsche, McLaren y Mercedes-AMG apilados" />
+              <img src="/assets/hero/hero-cars-stack-v3-black.png" alt="Porsche, McLaren y Mercedes-AMG apilados" />
             </figure>
           </div>
         </section>
