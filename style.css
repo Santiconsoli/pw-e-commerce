@@ -363,9 +363,9 @@ img {
 
 /* Contenedor para alinear el ancho de la página */
 .container {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 32px;
 }
 
 /* Estilos del Header */
@@ -621,7 +621,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 56px;
+    gap: 48px;
     min-height: calc(100vh - 120px);
     position: relative;
     z-index: 1;
@@ -680,10 +680,10 @@ main {
 
 .hero-cars {
     position: relative;
-    flex: 0 1 680px;
-    width: min(100%, 680px);
-    height: 720px;
-    margin-right: -14%;
+    flex: 0 1 620px;
+    width: min(100%, 620px);
+    height: 760px;
+    margin-right: 0;
     pointer-events: none;
     z-index: 0;
 }
@@ -700,7 +700,7 @@ main {
 
 .hero-car {
     position: absolute;
-    right: -12%;
+    right: 0;
     max-width: none;
     filter: drop-shadow(0 26px 44px rgba(0, 0, 0, 0.48));
     transform-origin: right center;
@@ -713,14 +713,14 @@ main {
 }
 
 .hero-car-middle {
-    top: 38%;
-    width: 104%;
+    top: 34%;
+    width: 102%;
     z-index: 2;
 }
 
 .hero-car-bottom {
-    top: 76%;
-    width: 104%;
+    top: 68%;
+    width: 102%;
     z-index: 1;
 }
 
