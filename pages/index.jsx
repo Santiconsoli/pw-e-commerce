@@ -157,8 +157,10 @@ export default function Home() {
               <a href="#catalogo" className="hero-cta">Explorar colección</a>
             </div>
 
-            <figure className="hero-cars hero-cars-single" aria-label="Porsche, McLaren y Mercedes-AMG destacados">
-              <img src="/assets/hero/hero-cars-stack-v3-black.png" alt="Porsche, McLaren y Mercedes-AMG apilados" />
+            <figure className="hero-cars hero-cars-stack" aria-label="McLaren, Porsche y Ferrari destacados">
+              <img className="hero-car hero-car-top" src="/assets/hero/mpng.png" alt="McLaren negro lateral" />
+              <img className="hero-car hero-car-middle" src="/assets/hero/ppng.png" alt="Porsche blanco lateral" />
+              <img className="hero-car hero-car-bottom" src="/assets/hero/fpng.png" alt="Ferrari rojo lateral" />
             </figure>
           </div>
         </section>
