@@ -2080,7 +2080,7 @@ main {
 
     .hero-cars {
         width: min(100%, 314px);
-        height: 500px;
+        height: 800px;
         margin-top: 6px;
     }
 
@@ -2093,7 +2093,7 @@ main {
     }
 
     .hero-car-middle {
-        top: 34%;
+        top: 27%;
         width: 96%;
     }
 
