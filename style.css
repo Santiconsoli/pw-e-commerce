@@ -702,18 +702,19 @@ main {
     position: absolute;
     right: 0;
     max-width: none;
-    filter: drop-shadow(0 26px 44px rgba(0, 0, 0, 0.48));
+    opacity: 0.88;
+    filter: brightness(0.84) saturate(0.88) contrast(0.96) drop-shadow(0 26px 44px rgba(0, 0, 0, 0.48));
     transform-origin: right center;
 }
 
 .hero-car-top {
     top: 0;
-    width: 100%;
+    width: 102%;
     z-index: 3;
 }
 
 .hero-car-middle {
-    top: 25%;
+    top: 27%;
     width: 102%;
     z-index: 2;
 }
@@ -1767,7 +1768,8 @@ main {
 
     .hero-car {
         right: -8%;
-        filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.42));
+        opacity: 0.86;
+        filter: brightness(0.82) saturate(0.86) contrast(0.95) drop-shadow(0 18px 28px rgba(0, 0, 0, 0.42));
     }
 
     .hero-car-top {
@@ -2084,6 +2086,7 @@ main {
 
     .hero-car {
         right: -10%;
+        opacity: 0.84;
     }
 
     .hero-car-top {
