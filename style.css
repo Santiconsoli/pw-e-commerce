@@ -2080,17 +2080,16 @@ main {
 
     .hero-cars {
         width: min(100%, 314px);
-        height: 266px;
+        height: 100px;
         margin-top: 6px;
     }
 
     .hero-car {
-        right: -2%;
-        opacity: 0.84;
+        opacity: 0.95;
     }
 
     .hero-car-top {
-        width: 94%;
+        width: 96%;
     }
 
     .hero-car-middle {
