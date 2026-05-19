@@ -702,7 +702,7 @@ main {
     position: absolute;
     right: 0;
     max-width: none;
-    opacity: 0.88;
+    opacity: 0.95;
     filter: brightness(0.84) saturate(0.88) contrast(0.96) drop-shadow(0 26px 44px rgba(0, 0, 0, 0.48));
     transform-origin: right center;
 }
@@ -1716,14 +1716,14 @@ main {
     }
 
     .hero-section {
-        padding: 22px 0 28px;
+        padding: 34px 0 28px;
     }
 
     .hero-layout {
         min-height: auto;
         flex-direction: column;
         align-items: stretch;
-        gap: 4px;
+        gap: 12px;
     }
 
     .hero-copy {
@@ -1760,31 +1760,31 @@ main {
 
     .hero-cars {
         flex: none;
-        width: min(100%, 430px);
-        height: 268px;
-        margin: -86px auto 0;
+        width: min(100%, 390px);
+        height: 332px;
+        margin: 8px auto 0;
         overflow: visible;
     }
 
     .hero-car {
-        right: -8%;
+        right: -2%;
         opacity: 0.86;
         filter: brightness(0.82) saturate(0.86) contrast(0.95) drop-shadow(0 18px 28px rgba(0, 0, 0, 0.42));
     }
 
     .hero-car-top {
         top: 0;
-        width: 110%;
+        width: 92%;
     }
 
     .hero-car-middle {
-        top: 38%;
-        width: 112%;
+        top: 34%;
+        width: 94%;
     }
 
     .hero-car-bottom {
-        top: 77%;
-        width: 112%;
+        top: 68%;
+        width: 94%;
     }
 
     .hero-line {
@@ -2067,7 +2067,7 @@ main {
     }
 
     .hero-section {
-        padding-top: 22px;
+        padding-top: 30px;
     }
 
     .hero-copy h1 {
@@ -2079,28 +2079,28 @@ main {
     }
 
     .hero-cars {
-        width: min(100%, 328px);
-        height: 224px;
-        margin-top: -98px;
+        width: min(100%, 314px);
+        height: 266px;
+        margin-top: 6px;
     }
 
     .hero-car {
-        right: -10%;
+        right: -2%;
         opacity: 0.84;
     }
 
     .hero-car-top {
-        width: 116%;
+        width: 94%;
     }
 
     .hero-car-middle {
-        top: 39%;
-        width: 118%;
+        top: 34%;
+        width: 96%;
     }
 
     .hero-car-bottom {
-        top: 78%;
-        width: 118%;
+        top: 68%;
+        width: 96%;
     }
 
     .section-heading h2 {
