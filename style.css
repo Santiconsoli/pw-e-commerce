@@ -856,8 +856,11 @@ main {
         linear-gradient(135deg, #151515 0%, #0b0b0b 26%, #050505 58%, #020202 100%);
 }
 
-.checkout-header {
-    position: sticky;
+.header-link-btn {
+    width: auto;
+    min-width: max-content;
+    padding: 0 18px;
+    border-radius: 999px;
 }
 
 .checkout-page-main {
@@ -1056,6 +1059,113 @@ main {
     align-items: center;
     justify-content: center;
     text-decoration: none;
+}
+
+/* About Page */
+.about-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.22), transparent 22%),
+        radial-gradient(circle at 12% 8%, rgba(212, 167, 73, 0.18), transparent 28%),
+        radial-gradient(circle at 88% 72%, rgba(10, 30, 58, 0.46), transparent 30%),
+        linear-gradient(135deg, #151515 0%, #0b0b0b 26%, #050505 58%, #020202 100%);
+}
+
+.about-page-main {
+    position: relative;
+}
+
+.about-page-hero {
+    position: relative;
+    padding: 54px 0 88px;
+    overflow: hidden;
+}
+
+.about-page-lines {
+    opacity: 0.78;
+}
+
+.about-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 430px);
+    gap: 28px;
+    align-items: start;
+}
+
+.about-stage,
+.about-visual-card {
+    border: 1px solid #1c1c1c;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent 58%),
+        rgba(8, 8, 8, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+}
+
+.about-stage {
+    border-radius: 30px;
+    padding: 34px;
+}
+
+.about-stage-heading h1 {
+    margin-bottom: 18px;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.06em;
+    max-width: 11ch;
+}
+
+.about-page-description {
+    max-width: 54ch;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.82;
+}
+
+.about-page-description + .about-page-description {
+    margin-top: 16px;
+}
+
+.about-visual-panel {
+    position: sticky;
+    top: 110px;
+}
+
+.about-visual-card {
+    border-radius: 30px;
+    padding: 24px;
+}
+
+.about-visual-eyebrow {
+    margin-bottom: 14px;
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.about-photo-placeholder {
+    min-height: 520px;
+    border: 1px dashed rgba(212, 167, 73, 0.36);
+    border-radius: 24px;
+    background:
+        linear-gradient(140deg, rgba(255, 255, 255, 0.03), transparent 55%),
+        rgba(255, 255, 255, 0.015);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    text-align: center;
+}
+
+.about-photo-placeholder span {
+    color: var(--text-muted);
+    font-size: 0.94rem;
+    line-height: 1.7;
+    max-width: 18ch;
 }
 
 .checkout-summary-panel {
@@ -1698,7 +1808,7 @@ main {
         border-radius: 50%;
     }
 
-    .checkout-header .cart-btn {
+    .header-link-btn {
         width: auto;
         min-width: max-content;
         height: 44px;
@@ -1867,7 +1977,16 @@ main {
         padding: 24px 0 48px;
     }
 
+    .about-page-hero {
+        padding: 24px 0 48px;
+    }
+
     .checkout-shell {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .about-shell {
         grid-template-columns: 1fr;
         gap: 16px;
     }
@@ -1878,11 +1997,22 @@ main {
         border-radius: 20px;
     }
 
+    .about-stage,
+    .about-visual-card {
+        padding: 18px;
+        border-radius: 20px;
+    }
+
     .checkout-stage-heading {
         margin-bottom: 22px;
     }
 
     .checkout-stage-heading h1 {
+        margin-bottom: 12px;
+        font-size: clamp(2.1rem, 11vw, 3rem);
+    }
+
+    .about-stage-heading h1 {
         margin-bottom: 12px;
         font-size: clamp(2.1rem, 11vw, 3rem);
     }
@@ -1905,6 +2035,15 @@ main {
 
     .checkout-summary-panel {
         position: static;
+    }
+
+    .about-visual-panel {
+        position: static;
+    }
+
+    .about-photo-placeholder {
+        min-height: 300px;
+        border-radius: 18px;
     }
 
     .checkout-order-item {
@@ -2057,7 +2196,7 @@ main {
         height: 42px;
     }
 
-    .checkout-header .cart-btn {
+    .header-link-btn {
         width: auto;
         min-width: max-content;
         height: 42px;
@@ -2069,12 +2208,25 @@ main {
         padding-top: 30px;
     }
 
+    .about-page-hero {
+        padding-top: 30px;
+    }
+
     .hero-copy h1 {
         font-size: clamp(2.25rem, 12vw, 3.1rem);
     }
 
     .hero-description {
         font-size: 0.92rem;
+    }
+
+    .about-page-description {
+        font-size: 0.92rem;
+    }
+
+    .about-photo-placeholder {
+        min-height: 240px;
+        padding: 22px;
     }
 
     .hero-cars {

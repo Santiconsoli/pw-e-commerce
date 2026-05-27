@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="site-footer" id="contacto">
+    <footer className="site-footer">
       <div className="container footer-content">
         <div className="footer-column footer-brand">
           <span className="footer-logo">525<span>hp</span></span>
@@ -16,7 +16,6 @@ export default function Footer() {
             <li><span className="footer-link footer-static">Inicio</span></li>
             <li><span className="footer-link footer-static">Catálogo</span></li>
             <li><span className="footer-link footer-static">Nosotros</span></li>
-            <li><span className="footer-link footer-static">Contacto</span></li>
           </ul>
         </div>
 

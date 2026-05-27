@@ -95,7 +95,7 @@ export default function CheckoutPage() {
       </Head>
 
       <div className="checkout-page">
-        <Header checkout />
+        <Header actionHref="/#catalogo" actionLabel="Seguir comprando" />
 
         <main className="checkout-page-main">
           <section className="checkout-page-hero">
