@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Footer() {
   return (
     <footer className="site-footer">
@@ -13,9 +15,9 @@ export default function Footer() {
         <div className="footer-column">
           <h2 className="footer-title">Enlaces rápidos</h2>
           <ul className="footer-list">
-            <li><span className="footer-link footer-static">Inicio</span></li>
-            <li><span className="footer-link footer-static">Catálogo</span></li>
-            <li><span className="footer-link footer-static">Nosotros</span></li>
+            <li><Link href="/#inicio" className="footer-link">Inicio</Link></li>
+            <li><Link href="/#catalogo" className="footer-link">Catálogo</Link></li>
+            <li><Link href="/nosotros" className="footer-link">Nosotros</Link></li>
           </ul>
         </div>
 

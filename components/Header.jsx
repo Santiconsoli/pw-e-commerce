@@ -1,15 +1,56 @@
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function Header({
   cartCount = 0,
   isCartOpen = false,
-  isMenuOpen = false,
+  isMenuOpen,
   onOpenCart,
   onOpenMenu,
   onCloseMenu,
   actionHref = null,
   actionLabel = 'Seguir comprando'
 }) {
+  const [internalMenuOpen, setInternalMenuOpen] = useState(false);
+  const isMenuControlled = typeof onOpenMenu === 'function' || typeof onCloseMenu === 'function';
+  const menuOpen = isMenuControlled ? Boolean(isMenuOpen) : internalMenuOpen;
+
+  const handleOpenMenu = () => {
+    if (isMenuControlled) {
+      onOpenMenu?.();
+      return;
+    }
+    setInternalMenuOpen(true);
+  };
+
+  const handleCloseMenu = () => {
+    if (isMenuControlled) {
+      onCloseMenu?.();
+      return;
+    }
+    setInternalMenuOpen(false);
+  };
+
+  useEffect(() => {
+    if (isMenuControlled || !menuOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setInternalMenuOpen(false);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMenuControlled, menuOpen]);
+
   return (
     <>
       <header className="main-header">
@@ -19,8 +60,8 @@ export default function Header({
             className="menu-toggle"
             aria-label="Abrir menú de navegación"
             aria-controls="mobile-menu"
-            aria-expanded={isMenuOpen}
-            onClick={onOpenMenu}
+            aria-expanded={menuOpen}
+            onClick={handleOpenMenu}
           >
             <span></span>
             <span></span>
@@ -64,14 +105,14 @@ export default function Header({
       </header>
 
       <div
-        className={`menu-overlay ${isMenuOpen ? 'is-visible' : ''}`}
-        hidden={!isMenuOpen}
-        onClick={onCloseMenu}
+        className={`menu-overlay ${menuOpen ? 'is-visible' : ''}`}
+        hidden={!menuOpen}
+        onClick={handleCloseMenu}
       />
       <aside
-        className={`mobile-menu ${isMenuOpen ? 'is-open' : ''}`}
+        className={`mobile-menu ${menuOpen ? 'is-open' : ''}`}
         id="mobile-menu"
-        aria-hidden={!isMenuOpen}
+        aria-hidden={!menuOpen}
         aria-labelledby="mobile-menu-title"
       >
         <div className="mobile-menu-header">
@@ -79,16 +120,16 @@ export default function Header({
             <p className="cart-panel-eyebrow">525hp</p>
             <h2 id="mobile-menu-title">Menú</h2>
           </div>
-          <button type="button" className="menu-close" aria-label="Cerrar menú" onClick={onCloseMenu}>
+          <button type="button" className="menu-close" aria-label="Cerrar menú" onClick={handleCloseMenu}>
             ×
           </button>
         </div>
 
         <nav className="mobile-menu-nav" aria-label="Navegación principal">
           <ul className="mobile-menu-list">
-            <li><Link href="/#inicio" className="mobile-menu-link" onClick={onCloseMenu}>Inicio</Link></li>
-            <li><Link href="/#catalogo" className="mobile-menu-link" onClick={onCloseMenu}>Catálogo</Link></li>
-            <li><Link href="/nosotros" className="mobile-menu-link" onClick={onCloseMenu}>Nosotros</Link></li>
+            <li><Link href="/#inicio" className="mobile-menu-link" onClick={handleCloseMenu}>Inicio</Link></li>
+            <li><Link href="/#catalogo" className="mobile-menu-link" onClick={handleCloseMenu}>Catálogo</Link></li>
+            <li><Link href="/nosotros" className="mobile-menu-link" onClick={handleCloseMenu}>Nosotros</Link></li>
           </ul>
         </nav>
       </aside>

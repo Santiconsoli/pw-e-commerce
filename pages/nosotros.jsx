@@ -31,7 +31,7 @@ export default function NosotrosPage() {
                   <p className="eyebrow">Nuestra visión</p>
                   <h1>Diseño automotriz convertido en presencia</h1>
                   <p className="about-page-description">
-                    En 525hp reinterpretamos piezas icónicas del universo automotor para darles una segunda vida como
+                    Somos una marca argentina enamorada del automóvil. En 525hp reinterpretamos piezas icónicas del universo automotor para darles una segunda vida como
                     muebles y objetos de lujo. Nuestro enfoque combina precisión técnica, estética contemporánea y una
                     obsesión por los detalles que convierten cada pieza en una declaración visual.
                   </p>
@@ -45,7 +45,7 @@ export default function NosotrosPage() {
 
               <aside className="about-visual-panel" aria-label="Fotografía destacada de 525hp">
                 <div className="about-visual-card">
-                  <p className="about-visual-eyebrow">Pieza destacada</p>
+                  <p className="about-visual-eyebrow">Inspiración</p>
                   <div className="about-photo-placeholder about-photo-placeholder--image">
                     <img
                       src="/assets/about/nosotros-orange-car.webp"
