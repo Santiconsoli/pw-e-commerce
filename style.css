@@ -859,8 +859,14 @@ main {
 .header-link-btn {
     width: auto;
     min-width: max-content;
-    padding: 0 18px;
+    min-height: 42px;
+    padding: 0 24px;
     border-radius: 999px;
+    gap: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .checkout-page-main {
@@ -1159,6 +1165,23 @@ main {
     justify-content: center;
     padding: 28px;
     text-align: center;
+}
+
+.about-photo-placeholder--image {
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.08);
+    background: #0d0d0d;
+    aspect-ratio: 4 / 5;
+}
+
+.about-photo-placeholder--image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .about-photo-placeholder span {
@@ -2046,6 +2069,11 @@ main {
         border-radius: 18px;
     }
 
+    .about-photo-placeholder--image {
+        min-height: 0;
+        aspect-ratio: 4 / 5;
+    }
+
     .checkout-order-item {
         grid-template-columns: 60px 1fr;
         padding: 10px;
@@ -2227,6 +2255,12 @@ main {
     .about-photo-placeholder {
         min-height: 240px;
         padding: 22px;
+    }
+
+    .about-photo-placeholder--image {
+        min-height: 0;
+        padding: 0;
+        aspect-ratio: 4 / 5;
     }
 
     .hero-cars {

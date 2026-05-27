@@ -43,11 +43,14 @@ export default function NosotrosPage() {
                 </div>
               </section>
 
-              <aside className="about-visual-panel" aria-label="Espacio reservado para fotografía de la marca">
+              <aside className="about-visual-panel" aria-label="Fotografía destacada de 525hp">
                 <div className="about-visual-card">
-                  <p className="about-visual-eyebrow">Próximamente</p>
-                  <div className="about-photo-placeholder">
-                    <span>Espacio reservado para foto de presentación</span>
+                  <p className="about-visual-eyebrow">Pieza destacada</p>
+                  <div className="about-photo-placeholder about-photo-placeholder--image">
+                    <img
+                      src="/assets/about/nosotros-orange-car.webp"
+                      alt="Deportivo naranja destacado de 525hp"
+                    />
                   </div>
                 </div>
               </aside>
