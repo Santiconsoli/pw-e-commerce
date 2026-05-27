@@ -4,7 +4,8 @@ import CartPanel from '../components/CartPanel';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import { products as fallbackProducts } from '../data/products';
+import { getProductsFromSupabase } from '../lib/supabase/products';
 
 const CART_STORAGE_KEY = '525hp-cart';
 
@@ -15,7 +16,7 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0
   }).format(value);
 
-export default function Home() {
+export default function Home({ catalogProducts }) {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setCartOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -173,7 +174,7 @@ export default function Home() {
             </div>
 
             <div className="product-grid">
-              {products.map((product) => (
+              {catalogProducts.map((product) => (
                 <ProductCard key={product.id} product={product} formatPrice={formatPrice} onAdd={handleAdd} />
               ))}
             </div>
@@ -216,4 +217,22 @@ export default function Home() {
       <Footer />
     </>
   );
+}
+
+export async function getServerSideProps() {
+  const { data, error } = await getProductsFromSupabase();
+
+  if (error || !data?.length) {
+    return {
+      props: {
+        catalogProducts: fallbackProducts
+      }
+    };
+  }
+
+  return {
+    props: {
+      catalogProducts: data
+    }
+  };
 }
