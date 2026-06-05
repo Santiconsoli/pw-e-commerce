@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { getSupabaseClient } from '../lib/supabase/client';
 
 export default function Header({
   cartCount = 0,
@@ -12,6 +13,7 @@ export default function Header({
   actionLabel = 'Seguir comprando'
 }) {
   const [internalMenuOpen, setInternalMenuOpen] = useState(false);
+  const [sessionEmail, setSessionEmail] = useState('');
   const isMenuControlled = typeof onOpenMenu === 'function' || typeof onCloseMenu === 'function';
   const menuOpen = isMenuControlled ? Boolean(isMenuOpen) : internalMenuOpen;
 
@@ -51,6 +53,26 @@ export default function Header({
     };
   }, [isMenuControlled, menuOpen]);
 
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      return undefined;
+    }
+
+    supabase.auth.getUser().then(({ data }) => {
+      setSessionEmail(data.user?.email || '');
+    });
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSessionEmail(session?.user?.email || '');
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <>
       <header className="main-header">
@@ -77,6 +99,7 @@ export default function Header({
               <li><Link href="/#inicio" className="nav-link">Inicio</Link></li>
               <li><Link href="/#catalogo" className="nav-link">Catálogo</Link></li>
               <li><Link href="/nosotros" className="nav-link">Nosotros</Link></li>
+              <li><Link href="/login" className="nav-link">{sessionEmail ? 'Cuenta' : 'Ingresar'}</Link></li>
             </ul>
           </nav>
 
@@ -130,6 +153,7 @@ export default function Header({
             <li><Link href="/#inicio" className="mobile-menu-link" onClick={handleCloseMenu}>Inicio</Link></li>
             <li><Link href="/#catalogo" className="mobile-menu-link" onClick={handleCloseMenu}>Catálogo</Link></li>
             <li><Link href="/nosotros" className="mobile-menu-link" onClick={handleCloseMenu}>Nosotros</Link></li>
+            <li><Link href="/login" className="mobile-menu-link" onClick={handleCloseMenu}>{sessionEmail ? 'Cuenta' : 'Ingresar'}</Link></li>
           </ul>
         </nav>
       </aside>

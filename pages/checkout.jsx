@@ -1,6 +1,9 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
+import { getSupabaseClient } from '../lib/supabase/client';
+import { createCheckoutOrder } from '../lib/supabase/orders';
 
 const CART_STORAGE_KEY = '525hp-cart';
 
@@ -15,6 +18,8 @@ export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState([]);
   const [toastMessage, setToastMessage] = useState('');
   const [toastTimer, setToastTimer] = useState(null);
+  const [isSubmitting, setSubmitting] = useState(false);
+  const [sessionEmail, setSessionEmail] = useState('');
   const [formState, setFormState] = useState({
     fullName: '',
     email: '',
@@ -31,6 +36,26 @@ export default function CheckoutPage() {
     } catch {
       setCartItems([]);
     }
+  }, []);
+
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      return undefined;
+    }
+
+    supabase.auth.getUser().then(({ data }) => {
+      setSessionEmail(data.user?.email || '');
+    });
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSessionEmail(session?.user?.email || '');
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -65,7 +90,7 @@ export default function CheckoutPage() {
     setFormState((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!cartItems.length) {
@@ -73,18 +98,32 @@ export default function CheckoutPage() {
       return;
     }
 
-    const orderNumber = `525-${Date.now().toString().slice(-6)}`;
-    localStorage.removeItem(CART_STORAGE_KEY);
-    setCartItems([]);
-    setFormState({
-      fullName: '',
-      email: '',
-      phone: '',
-      province: '',
-      address: '',
-      notes: ''
-    });
-    showToast(`Pedido ${orderNumber} confirmado. Te escribiremos para coordinar la entrega.`);
+    if (!sessionEmail) {
+      showToast('Iniciá sesión para guardar el pedido en Supabase.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const order = await createCheckoutOrder({ cartItems, formState, totalPrice });
+
+      localStorage.removeItem(CART_STORAGE_KEY);
+      setCartItems([]);
+      setFormState({
+        fullName: '',
+        email: '',
+        phone: '',
+        province: '',
+        address: '',
+        notes: ''
+      });
+      showToast(`Pedido ${order.referencia_pago} guardado. Te escribiremos para coordinar la entrega.`);
+    } catch (error) {
+      showToast(error.message || 'No pudimos guardar el pedido. Revisá Supabase e intentá nuevamente.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -116,6 +155,17 @@ export default function CheckoutPage() {
                 </div>
 
                 <form className="checkout-page-form" id="checkout-form" onSubmit={handleSubmit}>
+                  <div className="auth-inline-status">
+                    {sessionEmail ? (
+                      <span>Sesión activa: <strong>{sessionEmail}</strong></span>
+                    ) : (
+                      <>
+                        <span>Necesitás iniciar sesión para guardar el pedido.</span>
+                        <Link href="/login" className="auth-inline-link">Ingresar</Link>
+                      </>
+                    )}
+                  </div>
+
                   <div className="checkout-grid">
                     <label className="checkout-field">
                       <span>Nombre completo</span>
@@ -145,7 +195,9 @@ export default function CheckoutPage() {
 
                   <div className="checkout-page-actions">
                     <a href="/#catalogo" className="checkout-secondary-btn checkout-link-btn">Volver al catálogo</a>
-                    <button type="submit" className="checkout-primary-btn" disabled={!cartItems.length}>Confirmar pedido</button>
+                    <button type="submit" className="checkout-primary-btn" disabled={!cartItems.length || isSubmitting}>
+                      {isSubmitting ? 'Guardando...' : 'Confirmar pedido'}
+                    </button>
                   </div>
                 </form>
               </section>
