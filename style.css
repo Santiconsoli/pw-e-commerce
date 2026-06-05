@@ -1238,6 +1238,187 @@ main {
     line-height: 1.6;
 }
 
+.account-dashboard {
+    position: relative;
+}
+
+.account-card-heading {
+    margin-bottom: 26px;
+}
+
+.account-card-heading p,
+.account-section-title p {
+    margin-bottom: 8px;
+    color: var(--gold);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.account-card-heading h2 {
+    margin-bottom: 8px;
+    font-size: clamp(2.2rem, 4.8vw, 3.6rem);
+    line-height: 0.94;
+    letter-spacing: -0.06em;
+}
+
+.account-card-heading span {
+    display: block;
+    color: var(--text-muted);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.account-muted {
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.account-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.account-info-item {
+    min-height: 96px;
+    border: 1px solid #202020;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.035);
+    padding: 16px;
+}
+
+.account-info-item span {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.account-info-item strong {
+    display: block;
+    color: var(--text-white);
+    font-size: 0.98rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.account-orders {
+    border-top: 1px solid #1f1f1f;
+    padding-top: 26px;
+}
+
+.account-section-title {
+    margin-bottom: 16px;
+}
+
+.account-section-title h3 {
+    font-size: clamp(1.55rem, 3vw, 2.2rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
+}
+
+.account-order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none;
+}
+
+.account-order-card {
+    border: 1px solid rgba(212, 167, 73, 0.22);
+    border-radius: 20px;
+    background:
+        linear-gradient(145deg, rgba(212, 167, 73, 0.08), transparent 58%),
+        rgba(255, 255, 255, 0.035);
+    padding: 18px;
+}
+
+.account-order-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.account-order-top span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.account-order-top strong {
+    color: var(--text-white);
+    font-size: 1.35rem;
+}
+
+.account-order-status {
+    flex-shrink: 0;
+    border: 1px solid rgba(212, 167, 73, 0.28);
+    border-radius: 999px;
+    background: rgba(212, 167, 73, 0.1);
+    color: var(--text-white) !important;
+    padding: 8px 12px;
+    font-size: 0.72rem !important;
+}
+
+.account-order-date {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.account-order-products {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    list-style: none;
+}
+
+.account-order-products li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--text-white);
+}
+
+.account-order-products small {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.account-empty-orders {
+    border: 1px dashed rgba(212, 167, 73, 0.28);
+    border-radius: 20px;
+    background: rgba(212, 167, 73, 0.05);
+    padding: 22px;
+}
+
+.account-empty-orders p {
+    margin-bottom: 8px;
+    color: var(--text-white);
+    font-weight: 800;
+}
+
+.account-empty-orders span {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
 /* About Page */
 .about-page {
     min-height: 100vh;
@@ -2197,6 +2378,40 @@ main {
 
     .auth-card-heading h2 {
         font-size: clamp(2rem, 12vw, 2.8rem);
+    }
+
+    .account-card-heading h2 {
+        font-size: clamp(2rem, 12vw, 3rem);
+    }
+
+    .account-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .account-info-item {
+        min-height: auto;
+        padding: 14px;
+    }
+
+    .account-order-card {
+        padding: 16px;
+    }
+
+    .account-order-top {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .account-order-products li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .account-order-products small {
+        flex-shrink: 1;
     }
 
     .about-page-hero {

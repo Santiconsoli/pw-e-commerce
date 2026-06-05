@@ -5,6 +5,20 @@ import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import { getSupabaseClient } from '../lib/supabase/client';
 
+const formatPrice = (value) =>
+  new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0
+  }).format(value || 0);
+
+const formatDate = (value) =>
+  new Intl.DateTimeFormat('es-AR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  }).format(new Date(value));
+
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState('register');
@@ -15,8 +29,66 @@ export default function LoginPage() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
   const [sessionEmail, setSessionEmail] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [isAccountLoading, setAccountLoading] = useState(false);
+  const [accountError, setAccountError] = useState('');
 
   const nextPath = typeof router.query.next === 'string' ? router.query.next : '/checkout';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+
+  const getRedirectUrl = () => {
+    const origin = siteUrl || window.location.origin;
+    return `${origin}/login?next=${encodeURIComponent(nextPath)}`;
+  };
+
+  const loadAccountData = async (supabase, user) => {
+    if (!user) {
+      setProfile(null);
+      setOrders([]);
+      return;
+    }
+
+    setAccountLoading(true);
+    setAccountError('');
+
+    const [profileResult, ordersResult] = await Promise.all([
+      supabase
+        .from('usuarios')
+        .select('email, nombre, apellido, direccion, telefono, creado_en')
+        .eq('id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('ordenes')
+        .select(`
+          id,
+          total,
+          estado,
+          referencia_pago,
+          metodo_pago,
+          creado_en,
+          detalles_orden (
+            cantidad,
+            precio_unitario,
+            subtotal,
+            productos (
+              nombre,
+              imagen_url
+            )
+          )
+        `)
+        .order('creado_en', { ascending: false })
+    ]);
+
+    if (profileResult.error || ordersResult.error) {
+      setAccountError('No pudimos cargar toda la información de tu cuenta.');
+    }
+
+    setProfile(profileResult.data || null);
+    setOrders(ordersResult.data || []);
+    setAccountLoading(false);
+  };
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -27,13 +99,19 @@ export default function LoginPage() {
     }
 
     supabase.auth.getUser().then(({ data }) => {
-      setSessionEmail(data.user?.email || '');
+      const user = data.user || null;
+      setCurrentUser(user);
+      setSessionEmail(user?.email || '');
+      loadAccountData(supabase, user);
     });
 
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSessionEmail(session?.user?.email || '');
+      const user = session?.user || null;
+      setCurrentUser(user);
+      setSessionEmail(user?.email || '');
+      loadAccountData(supabase, user);
     });
 
     return () => subscription.unsubscribe();
@@ -87,6 +165,7 @@ export default function LoginPage() {
           email,
           password,
           options: {
+            emailRedirectTo: getRedirectUrl(),
             data: {
               full_name: fullName
             }
@@ -105,7 +184,11 @@ export default function LoginPage() {
       return;
     }
 
-    await saveProfile(supabase, data.user);
+    if (mode === 'register') {
+      await saveProfile(supabase, data.user);
+    }
+
+    await loadAccountData(supabase, data.user);
     setSubmitting(false);
 
     if (!data.session && mode === 'register') {
@@ -127,8 +210,13 @@ export default function LoginPage() {
 
     await supabase.auth.signOut();
     setSessionEmail('');
+    setCurrentUser(null);
+    setProfile(null);
+    setOrders([]);
     setMessage('Sesión cerrada.');
   };
+
+  const accountName = [profile?.nombre, profile?.apellido].filter(Boolean).join(' ');
 
   return (
     <>
@@ -152,20 +240,95 @@ export default function LoginPage() {
               <div className="auth-layout">
                 <section className="auth-copy-panel">
                   <p className="eyebrow">Cuenta 525hp</p>
-                  <h1>{mode === 'register' ? 'Creá tu cuenta' : 'Ingresá a tu cuenta'}</h1>
+                  <h1>{sessionEmail ? 'Mi cuenta' : mode === 'register' ? 'Creá tu cuenta' : 'Ingresá a tu cuenta'}</h1>
                   <p>
-                    Guardá tus datos de compra, seguí tus pedidos y avanzá más rápido en el checkout.
+                    {sessionEmail
+                      ? 'Consultá tu información, revisá tus pedidos y seguí construyendo tu garage.'
+                      : 'Guardá tus datos de compra, seguí tus pedidos y avanzá más rápido en el checkout.'}
                   </p>
                 </section>
 
                 <section className="checkout-stage auth-stage" aria-label="Formulario de cuenta">
                   {sessionEmail ? (
-                    <div className="auth-session-box">
-                      <p>Sesión activa como</p>
-                      <strong>{sessionEmail}</strong>
+                    <div className="account-dashboard">
+                      <div className="account-card-heading">
+                        <p>Panel privado</p>
+                        <h2>{accountName || 'Tu cuenta'}</h2>
+                        <span>{sessionEmail}</span>
+                      </div>
+
+                      {isAccountLoading ? (
+                        <p className="account-muted">Cargando información de tu cuenta...</p>
+                      ) : (
+                        <>
+                          <div className="account-info-grid">
+                            <div className="account-info-item">
+                              <span>Nombre</span>
+                              <strong>{accountName || 'Pendiente de completar'}</strong>
+                            </div>
+                            <div className="account-info-item">
+                              <span>Email</span>
+                              <strong>{profile?.email || currentUser?.email || sessionEmail}</strong>
+                            </div>
+                            <div className="account-info-item">
+                              <span>Teléfono</span>
+                              <strong>{profile?.telefono || 'Sin cargar'}</strong>
+                            </div>
+                            <div className="account-info-item">
+                              <span>Dirección</span>
+                              <strong>{profile?.direccion || 'Sin cargar'}</strong>
+                            </div>
+                          </div>
+
+                          <div className="account-orders">
+                            <div className="account-section-title">
+                              <p>Historial</p>
+                              <h3>Tus pedidos</h3>
+                            </div>
+
+                            {orders.length ? (
+                              <ul className="account-order-list">
+                                {orders.map((order) => (
+                                  <li key={order.id} className="account-order-card">
+                                    <div className="account-order-top">
+                                      <div>
+                                        <span>Pedido #{order.referencia_pago || order.id}</span>
+                                        <strong>{formatPrice(Number(order.total))}</strong>
+                                      </div>
+                                      <span className="account-order-status">{order.estado}</span>
+                                    </div>
+                                    <p className="account-order-date">{formatDate(order.creado_en)}</p>
+
+                                    {order.detalles_orden?.length ? (
+                                      <ul className="account-order-products">
+                                        {order.detalles_orden.map((detail, index) => (
+                                          <li key={`${order.id}-${index}`}>
+                                            <span>{detail.productos?.nombre || 'Producto 525hp'}</span>
+                                            <small>
+                                              {detail.cantidad} x {formatPrice(Number(detail.precio_unitario))}
+                                            </small>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : null}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="account-empty-orders">
+                                <p>Todavía no tenés pedidos realizados.</p>
+                                <span>Cuando confirmes tu primera compra, la vas a ver reflejada acá.</span>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {accountError && <p className="auth-message">{accountError}</p>}
+
                       <div className="checkout-page-actions auth-actions">
-                        <Link href={nextPath} className="checkout-primary-btn">
-                          {nextPath === '/checkout' ? 'Ir al checkout' : 'Continuar'}
+                        <Link href="/#catalogo" className="checkout-primary-btn">
+                          Ver colección
                         </Link>
                         <button type="button" className="checkout-secondary-btn" onClick={handleSignOut}>Cerrar sesión</button>
                       </div>

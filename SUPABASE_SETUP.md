@@ -29,5 +29,31 @@ Compatibilidad:
 3. Si las variables están bien cargadas, el catálogo se leerá desde Supabase.
 4. Si todavía no están, el proyecto seguirá usando `data/products.js` como respaldo.
 
-## 4. Limpieza opcional
+## 4. Configurar autenticación
+Para que el comprador cree una cuenta y quede logueado sin confirmar por email:
+
+1. En Supabase, entrá a `Authentication` -> `Providers`.
+2. Abrí el provider `Email`.
+3. Dejá habilitado el login por email.
+4. Desactivá `Confirm email`.
+5. Guardá los cambios.
+
+Para evitar links a localhost si en algún momento volvés a activar confirmación:
+
+1. En Supabase, entrá a `Authentication` -> `URL Configuration`.
+2. En `Site URL`, poné la URL de producción de Vercel.
+3. En `Redirect URLs`, agregá:
+
+```txt
+https://tu-dominio-de-vercel.vercel.app/**
+http://localhost:3000/**
+```
+
+En Vercel, agregá también:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://tu-dominio-de-vercel.vercel.app
+```
+
+## 5. Limpieza opcional
 Si la web deployed ya lee correctamente desde `productos`, podés borrar la tabla vieja `products` ejecutando `supabase/drop_legacy_products.sql`.
