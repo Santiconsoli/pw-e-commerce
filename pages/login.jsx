@@ -7,10 +7,13 @@ import { getSupabaseClient } from '../lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [mode, setMode] = useState('register');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
-  const [isGoogleLoading, setGoogleLoading] = useState(false);
   const [sessionEmail, setSessionEmail] = useState('');
 
   const nextPath = typeof router.query.next === 'string' ? router.query.next : '/checkout';
@@ -19,7 +22,7 @@ export default function LoginPage() {
     const supabase = getSupabaseClient();
 
     if (!supabase) {
-      setMessage('Supabase no esta configurado.');
+      setMessage('El ingreso no esta disponible por el momento.');
       return undefined;
     }
 
@@ -36,6 +39,24 @@ export default function LoginPage() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const saveProfile = async (supabase, user) => {
+    if (!user) {
+      return;
+    }
+
+    const [nombre = '', ...apellidoParts] = fullName.trim().split(/\s+/);
+
+    await supabase.from('usuarios').upsert(
+      {
+        id: user.id,
+        email: user.email || email,
+        nombre,
+        apellido: apellidoParts.join(' ')
+      },
+      { onConflict: 'id' }
+    );
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
@@ -44,51 +65,57 @@ export default function LoginPage() {
     const supabase = getSupabaseClient();
 
     if (!supabase) {
-      setMessage('Supabase no esta configurado.');
+      setMessage('El ingreso no esta disponible por el momento.');
       setSubmitting(false);
       return;
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/login?next=${encodeURIComponent(nextPath)}`
-      }
-    });
+    if (mode === 'register' && password !== passwordConfirm) {
+      setMessage('Las contraseñas no coinciden.');
+      setSubmitting(false);
+      return;
+    }
 
+    if (password.length < 6) {
+      setMessage('La contraseña debe tener al menos 6 caracteres.');
+      setSubmitting(false);
+      return;
+    }
+
+    const response = mode === 'register'
+      ? await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName
+            }
+          }
+        })
+      : await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+    const { data, error } = response;
+
+    if (error) {
+      setMessage(error.message);
+      setSubmitting(false);
+      return;
+    }
+
+    await saveProfile(supabase, data.user);
     setSubmitting(false);
 
-    if (error) {
-      setMessage(error.message);
+    if (!data.session && mode === 'register') {
+      setMessage('Cuenta creada. Revisá tu email para activarla y después ingresá con tu contraseña.');
       return;
     }
 
-    setMessage('Te enviamos un enlace de acceso. Revisá tu email para continuar.');
-  };
-
-  const handleGoogleSignIn = async () => {
-    setGoogleLoading(true);
-    setMessage('');
-
-    const supabase = getSupabaseClient();
-
-    if (!supabase) {
-      setMessage('Supabase no esta configurado.');
-      setGoogleLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/login?next=${encodeURIComponent(nextPath)}`
-      }
-    });
-
-    if (error) {
-      setMessage(error.message);
-      setGoogleLoading(false);
-    }
+    setSessionEmail(data.user?.email || email);
+    setMessage(mode === 'register' ? 'Cuenta creada correctamente.' : 'Ingreso correcto.');
+    window.setTimeout(() => router.push(nextPath), 700);
   };
 
   const handleSignOut = async () => {
@@ -124,14 +151,14 @@ export default function LoginPage() {
             <div className="container auth-shell auth-shell-wide">
               <div className="auth-layout">
                 <section className="auth-copy-panel">
-                  <p className="eyebrow">Acceso 525hp</p>
-                  <h1>Ingresá a tu cuenta</h1>
+                  <p className="eyebrow">Cuenta 525hp</p>
+                  <h1>{mode === 'register' ? 'Creá tu cuenta' : 'Ingresá a tu cuenta'}</h1>
                   <p>
-                    Usá Google o tu email para continuar con tu compra, revisar tu sesión y guardar pedidos en Supabase.
+                    Guardá tus datos de compra, seguí tus pedidos y avanzá más rápido en el checkout.
                   </p>
                 </section>
 
-                <section className="checkout-stage auth-stage" aria-label="Formulario de ingreso">
+                <section className="checkout-stage auth-stage" aria-label="Formulario de cuenta">
                   {sessionEmail ? (
                     <div className="auth-session-box">
                       <p>Sesión activa como</p>
@@ -145,19 +172,26 @@ export default function LoginPage() {
                     </div>
                   ) : (
                     <>
-                      <button
-                        type="button"
-                        className="auth-google-btn"
-                        onClick={handleGoogleSignIn}
-                        disabled={isGoogleLoading}
-                      >
-                        <span className="auth-google-icon" aria-hidden="true">G</span>
-                        {isGoogleLoading ? 'Conectando...' : 'Continuar con Google'}
-                      </button>
-
-                      <div className="auth-divider"><span>o ingresá con email</span></div>
+                      <div className="auth-card-heading">
+                        <p>{mode === 'register' ? 'Nuevo cliente' : 'Cliente registrado'}</p>
+                        <h2>{mode === 'register' ? 'Crear cuenta' : 'Ingresar'}</h2>
+                      </div>
 
                       <form className="checkout-page-form" onSubmit={handleSubmit}>
+                        {mode === 'register' && (
+                          <label className="checkout-field">
+                            <span>Nombre completo</span>
+                            <input
+                              type="text"
+                              name="fullName"
+                              placeholder="Tu nombre"
+                              required
+                              value={fullName}
+                              onChange={(event) => setFullName(event.target.value)}
+                            />
+                          </label>
+                        )}
+
                         <label className="checkout-field">
                           <span>Email</span>
                           <input
@@ -170,10 +204,55 @@ export default function LoginPage() {
                           />
                         </label>
 
+                        <label className="checkout-field">
+                          <span>Contraseña</span>
+                          <input
+                            type="password"
+                            name="password"
+                            placeholder="Mínimo 6 caracteres"
+                            required
+                            minLength={6}
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                          />
+                        </label>
+
+                        {mode === 'register' && (
+                          <label className="checkout-field">
+                            <span>Confirmar contraseña</span>
+                            <input
+                              type="password"
+                              name="passwordConfirm"
+                              placeholder="Repetí tu contraseña"
+                              required
+                              minLength={6}
+                              value={passwordConfirm}
+                              onChange={(event) => setPasswordConfirm(event.target.value)}
+                            />
+                          </label>
+                        )}
+
                         <button type="submit" className="checkout-primary-btn auth-submit-btn" disabled={isSubmitting}>
-                          {isSubmitting ? 'Enviando...' : 'Enviar enlace de acceso'}
+                          {isSubmitting
+                            ? 'Procesando...'
+                            : mode === 'register'
+                              ? 'Crear cuenta'
+                              : 'Ingresar'}
                         </button>
                       </form>
+
+                      <button
+                        type="button"
+                        className="auth-mode-toggle"
+                        onClick={() => {
+                          setMode((currentMode) => currentMode === 'register' ? 'login' : 'register');
+                          setMessage('');
+                        }}
+                      >
+                        {mode === 'register'
+                          ? 'Ya tengo cuenta'
+                          : 'Quiero crear una cuenta'}
+                      </button>
                     </>
                   )}
 

@@ -17,10 +17,11 @@ Compatibilidad:
 - si tu panel todavía te muestra `anon public key`, también funciona
 - el proyecto acepta `NEXT_PUBLIC_SUPABASE_ANON_KEY` como fallback
 
-## 2. Crear la tabla de productos
+## 2. Crear las tablas del e-commerce
 1. En Supabase, abrí `SQL Editor`.
-2. Pegá el contenido de `supabase/products.sql`.
+2. Pegá el contenido de `supabase/ecommerce_schema.sql`.
 3. Ejecutalo.
+4. Si ya tenías la tabla vieja `products`, pegá y ejecutá `supabase/fix_525hp_catalog.sql` para cargar el catálogo real en `productos`.
 
 ## 3. Probar la conexión
 1. Corré `npm run dev`.
@@ -28,7 +29,5 @@ Compatibilidad:
 3. Si las variables están bien cargadas, el catálogo se leerá desde Supabase.
 4. Si todavía no están, el proyecto seguirá usando `data/products.js` como respaldo.
 
-## 4. Próximo paso recomendado
-- Mover también pedidos / checkout a Supabase
-- Agregar autenticación si más adelante querés panel admin
-- Crear una tabla `orders` para guardar compras
+## 4. Limpieza opcional
+Si la web deployed ya lee correctamente desde `productos`, podés borrar la tabla vieja `products` ejecutando `supabase/drop_legacy_products.sql`.

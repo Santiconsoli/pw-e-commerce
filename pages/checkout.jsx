@@ -99,7 +99,7 @@ export default function CheckoutPage() {
     }
 
     if (!sessionEmail) {
-      showToast('Iniciá sesión para guardar el pedido en Supabase.');
+      showToast('Iniciá sesión para finalizar tu pedido.');
       return;
     }
 
@@ -120,7 +120,7 @@ export default function CheckoutPage() {
       });
       showToast(`Pedido ${order.referencia_pago} guardado. Te escribiremos para coordinar la entrega.`);
     } catch (error) {
-      showToast(error.message || 'No pudimos guardar el pedido. Revisá Supabase e intentá nuevamente.');
+      showToast(error.message || 'No pudimos confirmar tu pedido. Intentá nuevamente en unos minutos.');
     } finally {
       setSubmitting(false);
     }
