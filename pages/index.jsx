@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import ProductCard from '../components/ProductCard';
 import { products as fallbackProducts } from '../data/products';
-import { getProductsFromSupabase } from '../lib/supabase/products';
+import { getProductsFromSupabase, syncCartItemsWithSupabase } from '../lib/supabase/products';
 
 const CART_STORAGE_KEY = '525hp-cart';
 
@@ -18,25 +18,48 @@ const formatPrice = (value) =>
 
 export default function Home({ catalogProducts }) {
   const [cartItems, setCartItems] = useState([]);
+  const [isCartReady, setCartReady] = useState(false);
   const [isCartOpen, setCartOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastTimer, setToastTimer] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     try {
       const storedCart = localStorage.getItem(CART_STORAGE_KEY);
       if (storedCart) {
-        setCartItems(JSON.parse(storedCart));
+        const parsedCart = JSON.parse(storedCart);
+
+        syncCartItemsWithSupabase(parsedCart).then(({ data }) => {
+          if (isMounted) {
+            setCartItems(data);
+            setCartReady(true);
+          }
+        });
+        return () => {
+          isMounted = false;
+        };
       }
     } catch {
       setCartItems([]);
     }
+
+    setCartReady(true);
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
+    if (!isCartReady) {
+      return;
+    }
+
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-  }, [cartItems]);
+  }, [cartItems, isCartReady]);
 
   useEffect(() => {
     if (!isCartOpen && !isMenuOpen) {
@@ -81,10 +104,10 @@ export default function Home({ catalogProducts }) {
 
   const handleAdd = (product) => {
     setCartItems((prevItems) => {
-      const existing = prevItems.find((item) => item.id === product.id);
+      const existing = prevItems.find((item) => item.id === product.id || item.name === product.name);
       if (existing) {
         return prevItems.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === existing.id ? { ...item, ...product, quantity: item.quantity + 1 } : item
         );
       }
       return [...prevItems, { ...product, quantity: 1 }];

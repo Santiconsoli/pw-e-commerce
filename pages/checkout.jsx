@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import { getSupabaseClient } from '../lib/supabase/client';
 import { createCheckoutOrder } from '../lib/supabase/orders';
+import { syncCartItemsWithSupabase } from '../lib/supabase/products';
 
 const CART_STORAGE_KEY = '525hp-cart';
 
@@ -16,6 +17,7 @@ const formatPrice = (value) =>
 
 export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState([]);
+  const [isCartReady, setCartReady] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastTimer, setToastTimer] = useState(null);
   const [isSubmitting, setSubmitting] = useState(false);
@@ -30,13 +32,35 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
+    let isMounted = true;
+
     try {
       const storedCart = localStorage.getItem(CART_STORAGE_KEY);
-      setCartItems(storedCart ? JSON.parse(storedCart) : []);
+      const parsedCart = storedCart ? JSON.parse(storedCart) : [];
+
+      syncCartItemsWithSupabase(parsedCart).then(({ data }) => {
+        if (isMounted) {
+          setCartItems(data);
+          setCartReady(true);
+        }
+      });
     } catch {
       setCartItems([]);
+      setCartReady(true);
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isCartReady) {
+      return;
+    }
+
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+  }, [cartItems, isCartReady]);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
