@@ -1,9 +1,18 @@
 import { getSupabaseAdminClient } from '../../../lib/supabase/server';
 import crypto from 'crypto';
-
-const MERCADO_PAGO_API = 'https://api.mercadopago.com';
+import {
+  getMercadoPagoPayment,
+  getPaymentFromMerchantOrder,
+  updateSupabasePayment
+} from '../../../lib/mercadopago/payments';
 
 function getPaymentId(req) {
+  const notificationType = req.query.topic || req.query.type || req.body?.type;
+
+  if (notificationType === 'merchant_order') {
+    return null;
+  }
+
   return (
     req.query['data.id'] ||
     req.query.id ||
@@ -13,16 +22,18 @@ function getPaymentId(req) {
   );
 }
 
-function mapOrderStatus(paymentStatus) {
-  if (paymentStatus === 'approved') {
-    return 'pagada';
+function getMerchantOrderId(req) {
+  const notificationType = req.query.topic || req.query.type || req.body?.type;
+
+  if (notificationType === 'merchant_order') {
+    return req.query.id || req.body?.data?.id || req.body?.id || null;
   }
 
-  if (['cancelled', 'rejected', 'refunded', 'charged_back'].includes(paymentStatus)) {
-    return 'cancelada';
-  }
-
-  return 'pendiente';
+  return (
+    req.query.merchant_order_id ||
+    req.body?.merchant_order_id ||
+    null
+  );
 }
 
 function parseSignature(signatureHeader = '') {
@@ -81,61 +92,37 @@ export default async function handler(req, res) {
   }
 
   const paymentId = getPaymentId(req);
+  const merchantOrderId = getMerchantOrderId(req);
 
-  if (!paymentId) {
+  if (!paymentId && !merchantOrderId) {
     return res.status(200).json({ received: true });
   }
 
-  if (!isValidMercadoPagoSignature(req, paymentId)) {
+  if (paymentId && !isValidMercadoPagoSignature(req, paymentId)) {
     return res.status(401).json({ error: 'Firma de webhook invalida.' });
   }
 
-  const paymentResponse = await fetch(`${MERCADO_PAGO_API}/v1/payments/${paymentId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
+  try {
+    const paymentResult = paymentId
+      ? {
+          payment: await getMercadoPagoPayment(accessToken, paymentId),
+          fallbackOrderId: null
+        }
+      : await getPaymentFromMerchantOrder(accessToken, merchantOrderId);
+
+    if (!paymentResult.payment) {
+      return res.status(200).json({ received: true, ignored: 'Orden de Mercado Pago sin pago asociado todavia.' });
     }
-  });
 
-  const payment = await paymentResponse.json();
+    const updatedPayment = await updateSupabasePayment({
+      supabase,
+      payment: paymentResult.payment,
+      fallbackOrderId: paymentResult.fallbackOrderId
+    });
 
-  if (!paymentResponse.ok) {
-    return res.status(502).json({ error: 'No pudimos consultar el pago.' });
+    return res.status(200).json({ received: true, ...updatedPayment });
+  } catch (error) {
+    console.error('Mercado Pago webhook sync failed:', error);
+    return res.status(502).json({ error: 'No pudimos sincronizar el pago.' });
   }
-
-  const orderId = payment.external_reference || payment.metadata?.order_id;
-
-  if (!orderId) {
-    return res.status(200).json({ received: true, ignored: 'Sin orden asociada.' });
-  }
-
-  const orderStatus = mapOrderStatus(payment.status);
-  const paymentStatus = payment.status_detail || payment.status || 'unknown';
-  const approvedAt = payment.status === 'approved' ? new Date().toISOString() : null;
-
-  await supabase
-    .from('ordenes')
-    .update({
-      estado: orderStatus,
-      mercadopago_payment_id: String(payment.id),
-      mercadopago_status: paymentStatus,
-      pagado_en: approvedAt
-    })
-    .eq('id', orderId);
-
-  await supabase
-    .from('pagos')
-    .upsert(
-      {
-        orden_id: Number(orderId),
-        proveedor: 'mercadopago',
-        preference_id: payment.preference_id || null,
-        payment_id: String(payment.id),
-        estado: paymentStatus,
-        monto: Number(payment.transaction_amount || 0),
-        raw_payload: payment
-      },
-      { onConflict: 'payment_id' }
-    );
-
-  return res.status(200).json({ received: true });
 }

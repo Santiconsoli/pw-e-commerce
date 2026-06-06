@@ -1,86 +1,10 @@
 import { getSupabaseAdminClient } from '../../../lib/supabase/server';
-
-const MERCADO_PAGO_API = 'https://api.mercadopago.com';
-
-function mapOrderStatus(paymentStatus) {
-  if (paymentStatus === 'approved') {
-    return 'pagada';
-  }
-
-  if (['cancelled', 'rejected', 'refunded', 'charged_back'].includes(paymentStatus)) {
-    return 'cancelada';
-  }
-
-  return 'pendiente';
-}
-
-async function updatePaymentFromMercadoPago({ accessToken, supabase, paymentId, fallbackOrderId }) {
-  const paymentResponse = await fetch(`${MERCADO_PAGO_API}/v1/payments/${paymentId}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  });
-
-  const payment = await paymentResponse.json();
-
-  if (!paymentResponse.ok) {
-    return {
-      ok: false,
-      status: 502,
-      body: { error: 'No pudimos consultar el pago en Mercado Pago.' }
-    };
-  }
-
-  const orderId = payment.external_reference || payment.metadata?.order_id || fallbackOrderId;
-
-  if (!orderId) {
-    return {
-      ok: false,
-      status: 400,
-      body: { error: 'Mercado Pago no devolvió una orden asociada.' }
-    };
-  }
-
-  const orderStatus = mapOrderStatus(payment.status);
-  const paymentStatus = payment.status_detail || payment.status || 'unknown';
-  const approvedAt = payment.status === 'approved' ? new Date().toISOString() : null;
-
-  await supabase
-    .from('ordenes')
-    .update({
-      estado: orderStatus,
-      mercadopago_payment_id: String(payment.id),
-      mercadopago_status: paymentStatus,
-      pagado_en: approvedAt
-    })
-    .eq('id', orderId);
-
-  await supabase
-    .from('pagos')
-    .upsert(
-      {
-        orden_id: Number(orderId),
-        proveedor: 'mercadopago',
-        preference_id: payment.preference_id || null,
-        payment_id: String(payment.id),
-        estado: paymentStatus,
-        monto: Number(payment.transaction_amount || 0),
-        raw_payload: payment
-      },
-      { onConflict: 'payment_id' }
-    );
-
-  return {
-    ok: true,
-    status: 200,
-    body: {
-      received: true,
-      orderId: Number(orderId),
-      orderStatus,
-      paymentStatus
-    }
-  };
-}
+import {
+  getMercadoPagoPayment,
+  getPaymentFromMerchantOrder,
+  getPaymentFromPreference,
+  updateSupabasePayment
+} from '../../../lib/mercadopago/payments';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -95,13 +19,13 @@ export default async function handler(req, res) {
     return res.status(501).json({ error: 'Pagos no configurados.' });
   }
 
-  const { orderId, paymentId } = req.body || {};
+  const { orderId, paymentId, merchantOrderId, preferenceId } = req.body || {};
 
   if (!orderId) {
     return res.status(400).json({ error: 'Falta el ID de la orden.' });
   }
 
-  if (!paymentId || paymentId === 'null') {
+  if ((!paymentId || paymentId === 'null') && !merchantOrderId && !preferenceId) {
     return res.status(200).json({
       received: true,
       orderStatus: 'pendiente',
@@ -109,12 +33,40 @@ export default async function handler(req, res) {
     });
   }
 
-  const result = await updatePaymentFromMercadoPago({
-    accessToken,
-    supabase,
-    paymentId,
-    fallbackOrderId: orderId
-  });
+  try {
+    let paymentResult = {
+      payment: null,
+      fallbackOrderId: orderId
+    };
 
-  return res.status(result.status).json(result.body);
+    if (paymentId && paymentId !== 'null') {
+      paymentResult.payment = await getMercadoPagoPayment(accessToken, paymentId);
+    } else if (merchantOrderId) {
+      paymentResult = await getPaymentFromMerchantOrder(accessToken, merchantOrderId);
+    } else if (preferenceId) {
+      paymentResult = await getPaymentFromPreference(accessToken, preferenceId);
+    }
+
+    if (!paymentResult.payment) {
+      return res.status(200).json({
+        received: true,
+        orderStatus: 'pendiente',
+        paymentStatus: 'waiting_webhook'
+      });
+    }
+
+    const updatedPayment = await updateSupabasePayment({
+      supabase,
+      payment: paymentResult.payment,
+      fallbackOrderId: paymentResult.fallbackOrderId || orderId
+    });
+
+    return res.status(200).json({
+      received: true,
+      ...updatedPayment
+    });
+  } catch (error) {
+    console.error('Mercado Pago return sync failed:', error);
+    return res.status(502).json({ error: 'No pudimos sincronizar el pago.' });
+  }
 }

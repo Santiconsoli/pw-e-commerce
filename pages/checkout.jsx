@@ -150,6 +150,8 @@ export default function CheckoutPage() {
       getQueryValue(router.query.collection_id) ||
       getQueryValue(router.query['data.id']) ||
       null;
+    const merchantOrderId = getQueryValue(router.query.merchant_order_id) || null;
+    const preferenceId = getQueryValue(router.query.preference_id) || null;
 
     fetch('/api/payments/confirm-return', {
       method: 'POST',
@@ -158,7 +160,9 @@ export default function CheckoutPage() {
       },
       body: JSON.stringify({
         orderId: getQueryValue(router.query.order),
-        paymentId
+        paymentId,
+        merchantOrderId,
+        preferenceId
       })
     })
       .then((response) => response.json().catch(() => ({})))
