@@ -68,6 +68,8 @@ using (public.es_admin())
 with check (public.es_admin());
 
 -- 3. Funcion transaccional para crear orden y detalles con precios reales de la base.
+drop function if exists public.crear_orden_checkout(text, text, text, text, text, text, jsonb);
+
 create or replace function public.crear_orden_checkout(
   p_full_name text,
   p_email text,
@@ -78,7 +80,7 @@ create or replace function public.crear_orden_checkout(
   p_items jsonb
 )
 returns table (
-  id bigint,
+  orden_id bigint,
   referencia_pago varchar,
   total decimal(10, 2)
 )
