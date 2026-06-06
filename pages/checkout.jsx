@@ -131,6 +131,11 @@ export default function CheckoutPage() {
       failure: 'El pago no se pudo completar. Podés intentarlo nuevamente.'
     };
 
+    if (router.query.payment === 'success') {
+      localStorage.removeItem(CART_STORAGE_KEY);
+      setCartItems([]);
+    }
+
     showToast(messages[router.query.payment] || 'Volviste del proceso de pago.');
   }, [router.isReady, router.query.payment]);
 
@@ -215,16 +220,6 @@ export default function CheckoutPage() {
 
       if (paymentResponse.ok && paymentData.checkoutUrl) {
         shouldRedirectToPayment = true;
-        localStorage.removeItem(CART_STORAGE_KEY);
-        setCartItems([]);
-        setFormState({
-          fullName: '',
-          email: '',
-          phone: '',
-          province: '',
-          address: '',
-          notes: ''
-        });
         showToast('Pedido creado. Te llevamos a Mercado Pago.');
         window.location.href = paymentData.checkoutUrl;
         return;

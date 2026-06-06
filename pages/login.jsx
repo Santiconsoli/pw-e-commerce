@@ -230,6 +230,8 @@ export default function LoginPage() {
   };
 
   const accountName = [profile?.nombre, profile?.apellido].filter(Boolean).join(' ');
+  const completedOrders = orders.filter((order) => order.estado !== 'pendiente');
+  const pendingOrders = orders.filter((order) => order.estado === 'pendiente');
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value.trim().slice(0, 120));
@@ -311,9 +313,9 @@ export default function LoginPage() {
                               <h3>Tus pedidos</h3>
                             </div>
 
-                            {orders.length ? (
+                            {completedOrders.length ? (
                               <ul className="account-order-list">
-                                {orders.map((order) => (
+                                {completedOrders.map((order) => (
                                   <li key={order.id} className="account-order-card">
                                     <div className="account-order-top">
                                       <div>
@@ -342,9 +344,16 @@ export default function LoginPage() {
                             ) : (
                               <div className="account-empty-orders">
                                 <p>Todavía no tenés pedidos realizados.</p>
-                                <span>Cuando confirmes tu primera compra, la vas a ver reflejada acá.</span>
+                                <span>Cuando completes tu primer pago, la compra va a aparecer acá.</span>
                               </div>
                             )}
+
+                            {pendingOrders.length ? (
+                              <div className="account-empty-orders account-pending-orders">
+                                <p>Tenés {pendingOrders.length === 1 ? 'un pedido pendiente de pago' : `${pendingOrders.length} pedidos pendientes de pago`}.</p>
+                                <span>Si volviste desde Mercado Pago sin pagar, no se cuenta como compra finalizada.</span>
+                              </div>
+                            ) : null}
                           </div>
                         </>
                       )}
