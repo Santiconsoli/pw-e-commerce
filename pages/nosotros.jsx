@@ -15,7 +15,7 @@ export default function NosotrosPage() {
       </Head>
 
       <div className="about-page">
-        <Header actionHref="/#catalogo" actionLabel="Ver colección" />
+        <Header actionHref="/catalogo" actionLabel="Ver colección" />
 
         <main className="about-page-main">
           <section className="about-page-hero">

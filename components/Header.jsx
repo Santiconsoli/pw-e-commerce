@@ -97,7 +97,7 @@ export default function Header({
           <nav className="nav-wrapper">
             <ul className="nav-list">
               <li><Link href="/#inicio" className="nav-link">Inicio</Link></li>
-              <li><Link href="/#catalogo" className="nav-link">Catálogo</Link></li>
+              <li><Link href="/catalogo" className="nav-link">Catálogo</Link></li>
               <li><Link href="/nosotros" className="nav-link">Nosotros</Link></li>
               <li><Link href="/login" className="nav-link">{sessionEmail ? 'Cuenta' : 'Ingresar'}</Link></li>
             </ul>
@@ -151,7 +151,7 @@ export default function Header({
         <nav className="mobile-menu-nav" aria-label="Navegación principal">
           <ul className="mobile-menu-list">
             <li><Link href="/#inicio" className="mobile-menu-link" onClick={handleCloseMenu}>Inicio</Link></li>
-            <li><Link href="/#catalogo" className="mobile-menu-link" onClick={handleCloseMenu}>Catálogo</Link></li>
+            <li><Link href="/catalogo" className="mobile-menu-link" onClick={handleCloseMenu}>Catálogo</Link></li>
             <li><Link href="/nosotros" className="mobile-menu-link" onClick={handleCloseMenu}>Nosotros</Link></li>
             <li><Link href="/login" className="mobile-menu-link" onClick={handleCloseMenu}>{sessionEmail ? 'Cuenta' : 'Ingresar'}</Link></li>
           </ul>

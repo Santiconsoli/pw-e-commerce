@@ -327,7 +327,7 @@ export default function LoginPage() {
                       {accountError && <p className="auth-message">{accountError}</p>}
 
                       <div className="checkout-page-actions auth-actions">
-                        <Link href="/#catalogo" className="checkout-primary-btn">
+                        <Link href="/catalogo" className="checkout-primary-btn">
                           Ver colección
                         </Link>
                         <button type="button" className="checkout-secondary-btn" onClick={handleSignOut}>Cerrar sesión</button>

@@ -821,6 +821,213 @@ main {
     object-fit: contain;
 }
 
+/* Catalog Page */
+.catalog-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 4% 0%, rgba(212, 167, 73, 0.2), transparent 26%),
+        radial-gradient(circle at 96% 12%, rgba(26, 74, 142, 0.26), transparent 28%),
+        radial-gradient(circle at 72% 62%, rgba(127, 23, 35, 0.16), transparent 28%),
+        linear-gradient(135deg, #0b0b0b 0%, #050505 50%, #020202 100%);
+}
+
+.catalog-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 72px 0 46px;
+}
+
+.catalog-page-lines {
+    opacity: 0.72;
+}
+
+.catalog-hero-layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    gap: clamp(28px, 6vw, 88px);
+    align-items: end;
+}
+
+.catalog-hero-copy h1 {
+    max-width: 10ch;
+    margin-bottom: 22px;
+    font-size: clamp(3.8rem, 9vw, 8.8rem);
+    line-height: 0.88;
+    letter-spacing: -0.08em;
+}
+
+.catalog-hero-copy p:not(.eyebrow) {
+    max-width: 48ch;
+    color: var(--text-muted);
+    font-size: clamp(1rem, 1.4vw, 1.22rem);
+    line-height: 1.75;
+}
+
+.catalog-hero-stat {
+    border: 1px solid rgba(212, 167, 73, 0.3);
+    border-radius: 32px;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.07), transparent 48%),
+        rgba(7, 7, 7, 0.82);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+    padding: 28px;
+}
+
+.catalog-hero-stat span {
+    display: block;
+    color: var(--text-white);
+    font-size: clamp(4rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: -0.08em;
+}
+
+.catalog-hero-stat p {
+    margin: 14px 0 22px;
+    color: var(--text-muted);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.catalog-hero-stat strong,
+.catalog-hero-stat small {
+    display: block;
+}
+
+.catalog-hero-stat strong {
+    margin-bottom: 6px;
+    color: var(--text-white);
+    font-size: 1.08rem;
+}
+
+.catalog-hero-stat small {
+    color: var(--text-muted);
+}
+
+.catalog-section {
+    position: relative;
+    z-index: 1;
+    padding: 30px 0 4px;
+}
+
+.catalog-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+    gap: 14px;
+    align-items: end;
+    margin-bottom: 16px;
+}
+
+.catalog-search,
+.catalog-sort {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.catalog-search span,
+.catalog-sort span {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.catalog-search input,
+.catalog-sort select {
+    width: 100%;
+    min-height: 56px;
+    border: 1px solid #222;
+    border-radius: 18px;
+    background: rgba(10, 10, 10, 0.88);
+    color: var(--text-white);
+    padding: 0 18px;
+    font: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.catalog-search input:focus,
+.catalog-sort select:focus {
+    border-color: rgba(212, 167, 73, 0.74);
+    background: #111;
+}
+
+.catalog-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 42px;
+}
+
+.catalog-filter-pill {
+    border: 1px solid #252525;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--text-muted);
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.catalog-filter-pill:hover,
+.catalog-filter-pill.is-active {
+    border-color: rgba(212, 167, 73, 0.72);
+    background: rgba(212, 167, 73, 0.12);
+    color: var(--text-white);
+}
+
+.catalog-results-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.catalog-results-heading h2 {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+}
+
+.catalog-results-heading > p {
+    max-width: 30ch;
+    color: var(--text-muted);
+    line-height: 1.6;
+    text-align: right;
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.catalog-empty {
+    display: grid;
+    place-items: center;
+    gap: 18px;
+    min-height: 280px;
+    border: 1px dashed rgba(212, 167, 73, 0.26);
+    border-radius: 28px;
+    background: rgba(212, 167, 73, 0.05);
+    text-align: center;
+}
+
+.catalog-empty p {
+    color: var(--text-muted);
+    font-weight: 800;
+}
+
 .cart-toast {
     position: fixed;
     right: 24px;
@@ -2329,6 +2536,77 @@ main {
     .brand-strip {
         gap: 6px;
         margin-top: 28px;
+    }
+
+    .catalog-hero {
+        padding: 36px 0 26px;
+    }
+
+    .catalog-hero-layout {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        align-items: stretch;
+    }
+
+    .catalog-hero-copy h1 {
+        max-width: 9ch;
+        margin-bottom: 16px;
+        font-size: clamp(3rem, 16vw, 4.6rem);
+    }
+
+    .catalog-hero-copy p:not(.eyebrow) {
+        font-size: 0.98rem;
+        line-height: 1.65;
+    }
+
+    .catalog-hero-stat {
+        border-radius: 24px;
+        padding: 20px;
+    }
+
+    .catalog-hero-stat span {
+        font-size: clamp(3.2rem, 18vw, 4.6rem);
+    }
+
+    .catalog-section {
+        padding-top: 18px;
+    }
+
+    .catalog-toolbar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .catalog-search input,
+    .catalog-sort select {
+        min-height: 52px;
+        border-radius: 16px;
+    }
+
+    .catalog-filter-row {
+        gap: 8px;
+        margin-bottom: 28px;
+    }
+
+    .catalog-filter-pill {
+        padding: 10px 12px;
+        font-size: 0.72rem;
+    }
+
+    .catalog-results-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .catalog-results-heading > p {
+        text-align: left;
+    }
+
+    .catalog-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
     }
 
     .site-footer {

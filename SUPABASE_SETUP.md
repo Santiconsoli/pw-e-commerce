@@ -57,3 +57,8 @@ NEXT_PUBLIC_SITE_URL=https://tu-dominio-de-vercel.vercel.app
 
 ## 5. Limpieza opcional
 Si la web deployed ya lee correctamente desde `productos`, podés borrar la tabla vieja `products` ejecutando `supabase/drop_legacy_products.sql`.
+
+## 6. Configurar administrador
+Para convertir el usuario registrado en administrador y reforzar las reglas RLS, ejecutá `supabase/configure_admin_and_harden_rls.sql` desde Supabase SQL Editor.
+
+Si hay un solo usuario en `public.usuarios`, el script lo convierte automáticamente en admin. Si hay más de uno, editá `target_admin_email` dentro del script antes de ejecutarlo.

@@ -1,13 +1,12 @@
 import Head from 'next/head';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CartPanel from '../components/CartPanel';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import ProductCard from '../components/ProductCard';
 import { products as fallbackProducts } from '../data/products';
-import { getProductsFromSupabase, syncCartItemsWithSupabase } from '../lib/supabase/products';
-
-const CART_STORAGE_KEY = '525hp-cart';
+import { useCart } from '../hooks/useCart';
+import { getProductsFromSupabase } from '../lib/supabase/products';
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('es-AR', {
@@ -17,49 +16,18 @@ const formatPrice = (value) =>
   }).format(value);
 
 export default function Home({ catalogProducts }) {
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartReady, setCartReady] = useState(false);
   const [isCartOpen, setCartOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastTimer, setToastTimer] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    try {
-      const storedCart = localStorage.getItem(CART_STORAGE_KEY);
-      if (storedCart) {
-        const parsedCart = JSON.parse(storedCart);
-
-        syncCartItemsWithSupabase(parsedCart).then(({ data }) => {
-          if (isMounted) {
-            setCartItems(data);
-            setCartReady(true);
-          }
-        });
-        return () => {
-          isMounted = false;
-        };
-      }
-    } catch {
-      setCartItems([]);
-    }
-
-    setCartReady(true);
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isCartReady) {
-      return;
-    }
-
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-  }, [cartItems, isCartReady]);
+  const {
+    cartItems,
+    totalPrice,
+    cartCount,
+    toastMessage,
+    handleAdd,
+    handleQtyChange,
+    handleRemove,
+    handleClear
+  } = useCart();
 
   useEffect(() => {
     if (!isCartOpen && !isMenuOpen) {
@@ -82,58 +50,6 @@ export default function Home({ catalogProducts }) {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isCartOpen, isMenuOpen]);
-
-  const totalPrice = useMemo(
-    () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    [cartItems]
-  );
-
-  const cartCount = useMemo(
-    () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
-    [cartItems]
-  );
-
-  const showToast = (message) => {
-    setToastMessage(message);
-    if (toastTimer) {
-      clearTimeout(toastTimer);
-    }
-    const timer = window.setTimeout(() => setToastMessage(''), 2000);
-    setToastTimer(timer);
-  };
-
-  const handleAdd = (product) => {
-    setCartItems((prevItems) => {
-      const existing = prevItems.find((item) => item.id === product.id || item.name === product.name);
-      if (existing) {
-        return prevItems.map((item) =>
-          item.id === existing.id ? { ...item, ...product, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
-    });
-    showToast(`${product.name} agregado al Garage`);
-  };
-
-  const handleQtyChange = (productId, delta) => {
-    setCartItems((prevItems) =>
-      prevItems
-        .map((item) =>
-          item.id === productId
-            ? { ...item, quantity: Math.max(item.quantity + delta, 1) }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
-  const handleRemove = (productId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
-  };
-
-  const handleClear = () => {
-    setCartItems([]);
-  };
 
   return (
     <>
@@ -178,7 +94,7 @@ export default function Home({ catalogProducts }) {
               <p className="hero-description">
                 Piezas icónicas del automóvil reinterpretadas como objetos de lujo para aquellos que comparten esta pasión.
               </p>
-              <a href="#catalogo" className="hero-cta">Explorar colección</a>
+              <a href="/catalogo" className="hero-cta">Explorar colección</a>
             </div>
 
             <figure className="hero-cars hero-cars-stack" aria-label="McLaren, Porsche y Ferrari destacados">

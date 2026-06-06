@@ -16,7 +16,7 @@ export default function Footer() {
           <h2 className="footer-title">Enlaces rápidos</h2>
           <ul className="footer-list">
             <li><Link href="/#inicio" className="footer-link">Inicio</Link></li>
-            <li><Link href="/#catalogo" className="footer-link">Catálogo</Link></li>
+            <li><Link href="/catalogo" className="footer-link">Catálogo</Link></li>
             <li><Link href="/nosotros" className="footer-link">Nosotros</Link></li>
           </ul>
         </div>

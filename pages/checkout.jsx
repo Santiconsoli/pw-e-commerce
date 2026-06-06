@@ -158,7 +158,7 @@ export default function CheckoutPage() {
       </Head>
 
       <div className="checkout-page">
-        <Header actionHref="/#catalogo" actionLabel="Seguir comprando" />
+        <Header actionHref="/catalogo" actionLabel="Seguir comprando" />
 
         <main className="checkout-page-main">
           <section className="checkout-page-hero">
@@ -218,7 +218,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="checkout-page-actions">
-                    <a href="/#catalogo" className="checkout-secondary-btn checkout-link-btn">Volver al catálogo</a>
+                    <a href="/catalogo" className="checkout-secondary-btn checkout-link-btn">Volver al catálogo</a>
                     <button type="submit" className="checkout-primary-btn" disabled={!cartItems.length || isSubmitting}>
                       {isSubmitting ? 'Guardando...' : 'Confirmar pedido'}
                     </button>

@@ -300,7 +300,11 @@ create policy "Clientes crean sus ordenes"
 on public.ordenes
 for insert
 to authenticated
-with check (auth.uid() = usuario_id);
+with check (
+  auth.uid() = usuario_id
+  and estado = 'pendiente'
+  and pagado_en is null
+);
 
 drop policy if exists "Admins ven todas las ordenes" on public.ordenes;
 create policy "Admins ven todas las ordenes"
@@ -350,6 +354,7 @@ with check (
     from public.ordenes o
     where o.id = detalles_orden.orden_id
       and o.usuario_id = auth.uid()
+      and o.estado = 'pendiente'
   )
 );
 
