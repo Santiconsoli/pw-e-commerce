@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import {
@@ -25,6 +26,7 @@ const formatPrice = (value) =>
   }).format(value);
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState([]);
   const [isCartReady, setCartReady] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -118,6 +120,20 @@ export default function CheckoutPage() {
     setToastTimer(timer);
   };
 
+  useEffect(() => {
+    if (!router.isReady || !router.query.payment) {
+      return;
+    }
+
+    const messages = {
+      success: 'Pago aprobado. Tu pedido quedó registrado.',
+      pending: 'Pago pendiente. Te avisaremos cuando se confirme.',
+      failure: 'El pago no se pudo completar. Podés intentarlo nuevamente.'
+    };
+
+    showToast(messages[router.query.payment] || 'Volviste del proceso de pago.');
+  }, [router.isReady, router.query.payment]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     const sanitizers = {
@@ -183,25 +199,50 @@ export default function CheckoutPage() {
     }
 
     setSubmitting(true);
+    let shouldRedirectToPayment = false;
 
     try {
       const order = await createCheckoutOrder({ cartItems, formState: validatedFormState, totalPrice });
-
-      localStorage.removeItem(CART_STORAGE_KEY);
-      setCartItems([]);
-      setFormState({
-        fullName: '',
-        email: '',
-        phone: '',
-        province: '',
-        address: '',
-        notes: ''
+      const paymentResponse = await fetch('/api/payments/create-preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ orderId: order.id })
       });
-      showToast(`Pedido ${order.referencia_pago} guardado. Te escribiremos para coordinar la entrega.`);
+
+      const paymentData = await paymentResponse.json().catch(() => ({}));
+
+      if (paymentResponse.ok && paymentData.checkoutUrl) {
+        shouldRedirectToPayment = true;
+        localStorage.removeItem(CART_STORAGE_KEY);
+        setCartItems([]);
+        setFormState({
+          fullName: '',
+          email: '',
+          phone: '',
+          province: '',
+          address: '',
+          notes: ''
+        });
+        showToast('Pedido creado. Te llevamos a Mercado Pago.');
+        window.location.href = paymentData.checkoutUrl;
+        return;
+      }
+
+      if (paymentResponse.status === 501) {
+        showToast('Mercado Pago no está configurado en Vercel. Revisá las variables privadas.');
+        return;
+      }
+
+      const paymentError = [paymentData.error, paymentData.detail].filter(Boolean).join(' ');
+      showToast(paymentError || `Pedido ${order.referencia_pago} guardado. No pudimos abrir Mercado Pago.`);
     } catch (error) {
       showToast(error.message || 'No pudimos confirmar tu pedido. Intentá nuevamente en unos minutos.');
     } finally {
-      setSubmitting(false);
+      if (!shouldRedirectToPayment) {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -333,7 +374,7 @@ export default function CheckoutPage() {
                   <div className="checkout-page-actions">
                     <a href="/catalogo" className="checkout-secondary-btn checkout-link-btn">Volver al catálogo</a>
                     <button type="submit" className="checkout-primary-btn" disabled={!cartItems.length || isSubmitting}>
-                      {isSubmitting ? 'Guardando...' : 'Confirmar pedido'}
+                      {isSubmitting ? 'Preparando pago...' : 'Confirmar y pagar'}
                     </button>
                   </div>
                 </form>

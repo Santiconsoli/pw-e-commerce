@@ -17,6 +17,15 @@ Compatibilidad:
 - si tu panel todavía te muestra `anon public key`, también funciona
 - el proyecto acepta `NEXT_PUBLIC_SUPABASE_ANON_KEY` como fallback
 
+Variables privadas para servidor:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
+MERCADOPAGO_ACCESS_TOKEN=tu_access_token_de_mercado_pago
+```
+
+Estas variables privadas van en Vercel, pero no deben empezar con `NEXT_PUBLIC_`.
+
 ## 2. Crear las tablas del e-commerce
 1. En Supabase, abrí `SQL Editor`.
 2. Pegá el contenido de `supabase/ecommerce_schema.sql`.
@@ -62,3 +71,16 @@ Si la web deployed ya lee correctamente desde `productos`, podés borrar la tabl
 Para convertir el usuario registrado en administrador y reforzar las reglas RLS, ejecutá `supabase/configure_admin_and_harden_rls.sql` desde Supabase SQL Editor.
 
 Si hay un solo usuario en `public.usuarios`, el script lo convierte automáticamente en admin. Si hay más de uno, editá `target_admin_email` dentro del script antes de ejecutarlo.
+
+## 7. Preparar transacciones y Mercado Pago
+1. En Supabase SQL Editor, ejecutá `supabase/payments_and_checkout.sql`.
+2. En Vercel, agregá `SUPABASE_SERVICE_ROLE_KEY`.
+3. En Vercel, agregá `MERCADOPAGO_ACCESS_TOKEN`.
+4. En Vercel, revisá que `NEXT_PUBLIC_SITE_URL` tenga la URL pública de producción.
+5. En Mercado Pago, configurá el webhook apuntando a:
+
+```txt
+https://tu-dominio-de-vercel.vercel.app/api/payments/webhook
+```
+
+El checkout crea la orden con una función transaccional en Supabase, genera la preferencia de Mercado Pago desde una API server-side y actualiza el estado de la orden cuando Mercado Pago llama al webhook.
