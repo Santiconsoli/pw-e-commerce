@@ -139,6 +139,39 @@ export default function CheckoutPage() {
     showToast(messages[router.query.payment] || 'Volviste del proceso de pago.');
   }, [router.isReady, router.query.payment]);
 
+  useEffect(() => {
+    if (!router.isReady || !router.query.payment || !router.query.order) {
+      return;
+    }
+
+    const getQueryValue = (value) => (Array.isArray(value) ? value[0] : value);
+    const paymentId =
+      getQueryValue(router.query.payment_id) ||
+      getQueryValue(router.query.collection_id) ||
+      getQueryValue(router.query['data.id']) ||
+      null;
+
+    fetch('/api/payments/confirm-return', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        orderId: getQueryValue(router.query.order),
+        paymentId
+      })
+    })
+      .then((response) => response.json().catch(() => ({})))
+      .then((data) => {
+        if (data.orderStatus === 'pagada') {
+          showToast('Pago confirmado. Tu compra ya quedó registrada.');
+        }
+      })
+      .catch(() => {
+        showToast('El pago quedó iniciado. Estamos esperando la confirmación.');
+      });
+  }, [router.isReady, router.query.payment, router.query.order]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     const sanitizers = {
