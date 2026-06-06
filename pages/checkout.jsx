@@ -2,6 +2,15 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
+import {
+  getPhoneDigits,
+  isValidEmail,
+  sanitizeAddress,
+  sanitizeNotes,
+  sanitizePersonName,
+  sanitizePhone,
+  sanitizeProvince
+} from '../lib/formValidation';
 import { getSupabaseClient } from '../lib/supabase/client';
 import { createCheckoutOrder } from '../lib/supabase/orders';
 import { syncCartItemsWithSupabase } from '../lib/supabase/products';
@@ -111,7 +120,16 @@ export default function CheckoutPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormState((prevState) => ({ ...prevState, [name]: value }));
+    const sanitizers = {
+      fullName: sanitizePersonName,
+      phone: sanitizePhone,
+      province: sanitizeProvince,
+      address: sanitizeAddress,
+      notes: sanitizeNotes
+    };
+    const nextValue = sanitizers[name] ? sanitizers[name](value) : value;
+
+    setFormState((prevState) => ({ ...prevState, [name]: nextValue }));
   };
 
   const handleSubmit = async (event) => {
@@ -122,6 +140,43 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (formState.fullName.trim().length < 3) {
+      showToast('Ingresá un nombre completo válido.');
+      return;
+    }
+
+    if (!isValidEmail(formState.email)) {
+      showToast('Ingresá un email válido.');
+      return;
+    }
+
+    const phoneDigits = getPhoneDigits(formState.phone);
+
+    if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+      showToast('Ingresá un teléfono válido, solo con números y prefijo si corresponde.');
+      return;
+    }
+
+    if (formState.province.trim().length < 3) {
+      showToast('Ingresá una provincia válida.');
+      return;
+    }
+
+    if (formState.address.trim().length < 6) {
+      showToast('Ingresá una dirección de entrega válida.');
+      return;
+    }
+
+    const validatedFormState = {
+      ...formState,
+      fullName: formState.fullName.trim(),
+      email: formState.email.trim(),
+      phone: formState.phone.trim(),
+      province: formState.province.trim(),
+      address: formState.address.trim(),
+      notes: formState.notes.trim()
+    };
+
     if (!sessionEmail) {
       showToast('Iniciá sesión para finalizar tu pedido.');
       return;
@@ -130,7 +185,7 @@ export default function CheckoutPage() {
     setSubmitting(true);
 
     try {
-      const order = await createCheckoutOrder({ cartItems, formState, totalPrice });
+      const order = await createCheckoutOrder({ cartItems, formState: validatedFormState, totalPrice });
 
       localStorage.removeItem(CART_STORAGE_KEY);
       setCartItems([]);
@@ -193,27 +248,85 @@ export default function CheckoutPage() {
                   <div className="checkout-grid">
                     <label className="checkout-field">
                       <span>Nombre completo</span>
-                      <input type="text" name="fullName" placeholder="Tu nombre" required value={formState.fullName} onChange={handleChange} />
+                      <input
+                        type="text"
+                        name="fullName"
+                        placeholder="Tu nombre"
+                        required
+                        minLength={3}
+                        maxLength={80}
+                        autoComplete="name"
+                        value={formState.fullName}
+                        onChange={handleChange}
+                      />
                     </label>
                     <label className="checkout-field">
                       <span>Email</span>
-                      <input type="email" name="email" placeholder="nombre@email.com" required value={formState.email} onChange={handleChange} />
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="nombre@email.com"
+                        required
+                        maxLength={120}
+                        autoComplete="email"
+                        value={formState.email}
+                        onChange={handleChange}
+                      />
                     </label>
                     <label className="checkout-field">
                       <span>Telefono</span>
-                      <input type="tel" name="phone" placeholder="+54 9 11 1234 5678" required value={formState.phone} onChange={handleChange} />
+                      <input
+                        type="tel"
+                        name="phone"
+                        placeholder="+54 9 11 1234 5678"
+                        required
+                        inputMode="tel"
+                        pattern="[\d+\s()\-]{8,24}"
+                        maxLength={24}
+                        autoComplete="tel"
+                        title="Usá solo números, espacios, paréntesis, guiones o + al inicio."
+                        value={formState.phone}
+                        onChange={handleChange}
+                      />
                     </label>
                     <label className="checkout-field">
                       <span>Provincia</span>
-                      <input type="text" name="province" placeholder="Buenos Aires" required value={formState.province} onChange={handleChange} />
+                      <input
+                        type="text"
+                        name="province"
+                        placeholder="Buenos Aires"
+                        required
+                        minLength={3}
+                        maxLength={60}
+                        autoComplete="address-level1"
+                        value={formState.province}
+                        onChange={handleChange}
+                      />
                     </label>
                     <label className="checkout-field checkout-field-full">
                       <span>Direccion de entrega</span>
-                      <input type="text" name="address" placeholder="Calle, numero, piso, depto" required value={formState.address} onChange={handleChange} />
+                      <input
+                        type="text"
+                        name="address"
+                        placeholder="Calle, numero, piso, depto"
+                        required
+                        minLength={6}
+                        maxLength={140}
+                        autoComplete="street-address"
+                        value={formState.address}
+                        onChange={handleChange}
+                      />
                     </label>
                     <label className="checkout-field checkout-field-full">
                       <span>Notas para tu pedido</span>
-                      <textarea name="notes" rows="4" placeholder="Instrucciones de entrega, referencias, etc." value={formState.notes} onChange={handleChange} />
+                      <textarea
+                        name="notes"
+                        rows="4"
+                        placeholder="Instrucciones de entrega, referencias, etc."
+                        maxLength={300}
+                        value={formState.notes}
+                        onChange={handleChange}
+                      />
                     </label>
                   </div>
 

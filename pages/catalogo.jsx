@@ -148,8 +148,9 @@ export default function CatalogPage({ catalogProducts }) {
                   <input
                     type="search"
                     placeholder="Mesa, reloj, lámpara..."
+                    maxLength={60}
                     value={searchTerm}
-                    onChange={(event) => setSearchTerm(event.target.value)}
+                    onChange={(event) => setSearchTerm(event.target.value.slice(0, 60))}
                   />
                 </label>
 

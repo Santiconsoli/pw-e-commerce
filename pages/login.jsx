@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
+import { isValidEmail, sanitizePersonName } from '../lib/formValidation';
 import { getSupabaseClient } from '../lib/supabase/client';
 
 const formatPrice = (value) =>
@@ -148,6 +149,18 @@ export default function LoginPage() {
       return;
     }
 
+    if (mode === 'register' && fullName.trim().length < 3) {
+      setMessage('Ingresá un nombre válido.');
+      setSubmitting(false);
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setMessage('Ingresá un email válido.');
+      setSubmitting(false);
+      return;
+    }
+
     if (mode === 'register' && password !== passwordConfirm) {
       setMessage('Las contraseñas no coinciden.');
       setSubmitting(false);
@@ -217,6 +230,18 @@ export default function LoginPage() {
   };
 
   const accountName = [profile?.nombre, profile?.apellido].filter(Boolean).join(' ');
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value.trim().slice(0, 120));
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value.slice(0, 72));
+  };
+
+  const handlePasswordConfirmChange = (event) => {
+    setPasswordConfirm(event.target.value.slice(0, 72));
+  };
 
   return (
     <>
@@ -349,8 +374,11 @@ export default function LoginPage() {
                               name="fullName"
                               placeholder="Tu nombre"
                               required
+                              minLength={3}
+                              maxLength={80}
+                              autoComplete="name"
                               value={fullName}
-                              onChange={(event) => setFullName(event.target.value)}
+                              onChange={(event) => setFullName(sanitizePersonName(event.target.value))}
                             />
                           </label>
                         )}
@@ -362,8 +390,10 @@ export default function LoginPage() {
                             name="email"
                             placeholder="nombre@email.com"
                             required
+                            maxLength={120}
+                            autoComplete="email"
                             value={email}
-                            onChange={(event) => setEmail(event.target.value)}
+                            onChange={handleEmailChange}
                           />
                         </label>
 
@@ -375,8 +405,10 @@ export default function LoginPage() {
                             placeholder="Mínimo 6 caracteres"
                             required
                             minLength={6}
+                            maxLength={72}
+                            autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
                             value={password}
-                            onChange={(event) => setPassword(event.target.value)}
+                            onChange={handlePasswordChange}
                           />
                         </label>
 
@@ -389,8 +421,10 @@ export default function LoginPage() {
                               placeholder="Repetí tu contraseña"
                               required
                               minLength={6}
+                              maxLength={72}
+                              autoComplete="new-password"
                               value={passwordConfirm}
-                              onChange={(event) => setPasswordConfirm(event.target.value)}
+                              onChange={handlePasswordConfirmChange}
                             />
                           </label>
                         )}
