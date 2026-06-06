@@ -85,11 +85,6 @@ export default function CatalogPage({ catalogProducts }) {
       });
   }, [activeRange, catalogProducts, searchTerm, sortMode]);
 
-  const highestPrice = useMemo(
-    () => catalogProducts.reduce((max, product) => Math.max(max, product.price), 0),
-    [catalogProducts]
-  );
-
   const lowestPrice = useMemo(
     () => catalogProducts.reduce((min, product) => Math.min(min, product.price), catalogProducts[0]?.price || 0),
     [catalogProducts]
@@ -140,7 +135,7 @@ export default function CatalogPage({ catalogProducts }) {
                 <span>{catalogProducts.length}</span>
                 <p>Piezas activas</p>
                 <strong>Desde {formatPrice(lowestPrice)}</strong>
-                <small>Máximo actual {formatPrice(highestPrice)}</small>
+                <small>Elegí tu próxima pieza de colección.</small>
               </aside>
             </div>
           </section>
@@ -184,9 +179,10 @@ export default function CatalogPage({ catalogProducts }) {
               <div className="catalog-results-heading">
                 <div>
                   <p className="eyebrow">La colección</p>
-                  <h2>{filteredProducts.length} piezas encontradas</h2>
+                  <h2>
+                    {filteredProducts.length} {filteredProducts.length === 1 ? 'pieza encontrada' : 'piezas encontradas'}
+                  </h2>
                 </div>
-                <p>Precios actualizados desde el catálogo conectado.</p>
               </div>
 
               {filteredProducts.length ? (
@@ -227,7 +223,7 @@ export default function CatalogPage({ catalogProducts }) {
         />
 
         {toastMessage && (
-          <div className="cart-toast" id="cart-toast" role="status" aria-live="polite" aria-atomic="true">
+          <div className="cart-toast is-visible" id="cart-toast" role="status" aria-live="polite" aria-atomic="true">
             {toastMessage}
           </div>
         )}

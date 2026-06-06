@@ -148,7 +148,7 @@ export default function Home({ catalogProducts }) {
       />
 
       {toastMessage && (
-        <div className="cart-toast" id="cart-toast" role="status" aria-live="polite" aria-atomic="true">
+        <div className="cart-toast is-visible" id="cart-toast" role="status" aria-live="polite" aria-atomic="true">
           {toastMessage}
         </div>
       )}
