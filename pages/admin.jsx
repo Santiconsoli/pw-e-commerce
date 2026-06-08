@@ -114,12 +114,8 @@ export default function AdminPage() {
           mercadopago_status,
           mercadopago_payment_id,
           pagado_en,
+          usuario_id,
           creado_en,
-          usuarios (
-            email,
-            nombre,
-            apellido
-          ),
           detalles_orden (
             cantidad,
             precio_unitario,
@@ -136,11 +132,23 @@ export default function AdminPage() {
     ]);
 
     if (productsResult.error || ordersResult.error || usersResult.error) {
+      console.error('Admin data load error:', {
+        products: productsResult.error,
+        orders: ordersResult.error,
+        users: usersResult.error
+      });
       setMessage('No pudimos cargar todos los datos del panel. Revisá RLS y tu rol admin.');
+      window.setTimeout(() => setMessage(''), 3200);
     }
 
+    const usersById = new Map((usersResult.data || []).map((adminUser) => [adminUser.id, adminUser]));
+    const ordersWithUsers = (ordersResult.data || []).map((order) => ({
+      ...order,
+      usuarios: usersById.get(order.usuario_id) || null
+    }));
+
     setProducts(productsResult.data || []);
-    setOrders(ordersResult.data || []);
+    setOrders(ordersWithUsers);
     setUsers(usersResult.data || []);
     setLoading(false);
   };
