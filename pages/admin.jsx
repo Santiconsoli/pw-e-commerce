@@ -449,10 +449,10 @@ export default function AdminPage() {
           : manualCustomerName,
         cliente_email: selectedUser?.email || manualCustomerEmail,
         total,
-        estado: manualOrderForm.status,
+        estado: 'pendiente',
         metodo_pago: manualOrderForm.paymentMethod,
         referencia_pago: reference,
-        pagado_en: paidStatus ? new Date().toISOString() : null
+        pagado_en: null
       })
       .select('id')
       .single();
@@ -479,6 +479,23 @@ export default function AdminPage() {
       setSaving(false);
       showMessage(detailsError.message || 'No pudimos cargar los productos de la orden.');
       return;
+    }
+
+    if (manualOrderForm.status !== 'pendiente') {
+      const { error: statusError } = await supabase
+        .from('ordenes')
+        .update({
+          estado: manualOrderForm.status,
+          pagado_en: paidStatus ? new Date().toISOString() : null
+        })
+        .eq('id', createdOrder.id);
+
+      if (statusError) {
+        await supabase.from('ordenes').delete().eq('id', createdOrder.id);
+        setSaving(false);
+        showMessage(statusError.message || 'No pudimos actualizar el estado ni descontar stock.');
+        return;
+      }
     }
 
     resetManualOrderForm();

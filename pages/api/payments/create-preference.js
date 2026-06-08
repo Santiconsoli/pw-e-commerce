@@ -47,9 +47,11 @@ export default async function handler(req, res) {
         cantidad,
         precio_unitario,
         productos (
+          id,
           nombre,
           descripcion,
-          imagen_url
+          imagen_url,
+          stock
         )
       )
     `)
@@ -62,6 +64,16 @@ export default async function handler(req, res) {
 
   if (order.estado !== 'pendiente') {
     return res.status(409).json({ error: 'La orden ya no esta pendiente de pago.' });
+  }
+
+  const unavailableItem = order.detalles_orden.find((detail) =>
+    Number(detail.productos?.stock || 0) < Number(detail.cantidad || 0)
+  );
+
+  if (unavailableItem) {
+    return res.status(409).json({
+      error: `No hay stock suficiente para ${unavailableItem.productos?.nombre || 'uno de los productos'}.`
+    });
   }
 
   const siteUrl = getSiteUrl(req);
