@@ -14,6 +14,7 @@ export default function Header({
 }) {
   const [internalMenuOpen, setInternalMenuOpen] = useState(false);
   const [sessionEmail, setSessionEmail] = useState('');
+  const [sessionRole, setSessionRole] = useState('');
   const isMenuControlled = typeof onOpenMenu === 'function' || typeof onCloseMenu === 'function';
   const menuOpen = isMenuControlled ? Boolean(isMenuOpen) : internalMenuOpen;
 
@@ -60,14 +61,31 @@ export default function Header({
       return undefined;
     }
 
+    const loadSession = async (user) => {
+      setSessionEmail(user?.email || '');
+
+      if (!user) {
+        setSessionRole('');
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('usuarios')
+        .select('rol')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      setSessionRole(profile?.rol || '');
+    };
+
     supabase.auth.getUser().then(({ data }) => {
-      setSessionEmail(data.user?.email || '');
+      loadSession(data.user || null);
     });
 
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSessionEmail(session?.user?.email || '');
+      loadSession(session?.user || null);
     });
 
     return () => subscription.unsubscribe();
@@ -99,6 +117,7 @@ export default function Header({
               <li><Link href="/#inicio" className="nav-link">Inicio</Link></li>
               <li><Link href="/catalogo" className="nav-link">Catálogo</Link></li>
               <li><Link href="/nosotros" className="nav-link">Nosotros</Link></li>
+              {sessionRole === 'admin' && <li><Link href="/admin" className="nav-link">Admin</Link></li>}
               <li><Link href="/login" className="nav-link">{sessionEmail ? 'Cuenta' : 'Ingresar'}</Link></li>
             </ul>
           </nav>
@@ -153,6 +172,7 @@ export default function Header({
             <li><Link href="/#inicio" className="mobile-menu-link" onClick={handleCloseMenu}>Inicio</Link></li>
             <li><Link href="/catalogo" className="mobile-menu-link" onClick={handleCloseMenu}>Catálogo</Link></li>
             <li><Link href="/nosotros" className="mobile-menu-link" onClick={handleCloseMenu}>Nosotros</Link></li>
+            {sessionRole === 'admin' && <li><Link href="/admin" className="mobile-menu-link" onClick={handleCloseMenu}>Admin</Link></li>}
             <li><Link href="/login" className="mobile-menu-link" onClick={handleCloseMenu}>{sessionEmail ? 'Cuenta' : 'Ingresar'}</Link></li>
           </ul>
         </nav>

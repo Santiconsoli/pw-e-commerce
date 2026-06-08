@@ -12,6 +12,28 @@ export default async function handler(req, res) {
     return res.status(501).json({ error: 'Supabase no esta configurado en el servidor.' });
   }
 
+  const token = req.headers.authorization?.replace(/^Bearer\s+/i, '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Falta token de administrador.' });
+  }
+
+  const { data: authData, error: authError } = await supabase.auth.getUser(token);
+
+  if (authError || !authData.user) {
+    return res.status(401).json({ error: 'Token invalido.' });
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from('usuarios')
+    .select('rol')
+    .eq('id', authData.user.id)
+    .maybeSingle();
+
+  if (profileError || profile?.rol !== 'admin') {
+    return res.status(403).json({ error: 'Solo un administrador puede sincronizar pagos.' });
+  }
+
   const { data: paidOrders, error: ordersError } = await supabase
     .from('ordenes')
     .select('id, total, mercadopago_payment_id, mercadopago_preference_id, mercadopago_status')

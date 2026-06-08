@@ -15,18 +15,10 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0
   }).format(value);
 
-const priceRanges = [
-  { id: 'all', label: 'Todos', min: 0, max: Infinity },
-  { id: 'under-100', label: 'Hasta $100k', min: 0, max: 100000 },
-  { id: '100-250', label: '$100k a $250k', min: 100000, max: 250000 },
-  { id: 'over-250', label: 'Más de $250k', min: 250000, max: Infinity }
-];
-
 export default function CatalogPage({ catalogProducts }) {
   const [isCartOpen, setCartOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeRange, setActiveRange] = useState('all');
   const [sortMode, setSortMode] = useState('featured');
   const {
     cartItems,
@@ -62,15 +54,13 @@ export default function CatalogPage({ catalogProducts }) {
   }, [isCartOpen, isMenuOpen]);
 
   const filteredProducts = useMemo(() => {
-    const selectedRange = priceRanges.find((range) => range.id === activeRange) || priceRanges[0];
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return catalogProducts
       .filter((product) => {
         const matchesSearch = !normalizedSearch || product.name.toLowerCase().includes(normalizedSearch);
-        const matchesPrice = product.price >= selectedRange.min && product.price <= selectedRange.max;
 
-        return matchesSearch && matchesPrice;
+        return matchesSearch;
       })
       .sort((firstProduct, secondProduct) => {
         if (sortMode === 'price-asc') {
@@ -83,7 +73,7 @@ export default function CatalogPage({ catalogProducts }) {
 
         return 0;
       });
-  }, [activeRange, catalogProducts, searchTerm, sortMode]);
+  }, [catalogProducts, searchTerm, sortMode]);
 
   const lowestPrice = useMemo(
     () => catalogProducts.reduce((min, product) => Math.min(min, product.price), catalogProducts[0]?.price || 0),
@@ -164,19 +154,6 @@ export default function CatalogPage({ catalogProducts }) {
                 </label>
               </div>
 
-              <div className="catalog-filter-row" aria-label="Filtros por precio">
-                {priceRanges.map((range) => (
-                  <button
-                    key={range.id}
-                    type="button"
-                    className={`catalog-filter-pill ${activeRange === range.id ? 'is-active' : ''}`}
-                    onClick={() => setActiveRange(range.id)}
-                  >
-                    {range.label}
-                  </button>
-                ))}
-              </div>
-
               <div className="catalog-results-heading">
                 <div>
                   <p className="eyebrow">La colección</p>
@@ -200,7 +177,6 @@ export default function CatalogPage({ catalogProducts }) {
                     className="checkout-primary-btn"
                     onClick={() => {
                       setSearchTerm('');
-                      setActiveRange('all');
                       setSortMode('featured');
                     }}
                   >
