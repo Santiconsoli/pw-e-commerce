@@ -79,6 +79,7 @@ export default function LoginPage() {
             )
           )
         `)
+        .eq('usuario_id', user.id)
         .order('creado_en', { ascending: false })
     ]);
 
