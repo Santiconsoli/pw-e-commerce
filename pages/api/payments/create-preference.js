@@ -93,9 +93,9 @@ export default async function handler(req, res) {
       referencia_pago: order.referencia_pago
     },
     back_urls: {
-      success: `${siteUrl}/checkout?payment=success&order=${order.id}`,
-      failure: `${siteUrl}/checkout?payment=failure&order=${order.id}`,
-      pending: `${siteUrl}/checkout?payment=pending&order=${order.id}`
+      success: `${siteUrl}/pago?payment=success&order=${order.id}`,
+      failure: `${siteUrl}/pago?payment=failure&order=${order.id}`,
+      pending: `${siteUrl}/pago?payment=pending&order=${order.id}`
     },
     notification_url: `${siteUrl}/api/payments/webhook?source_news=webhooks`,
     auto_return: 'approved'
