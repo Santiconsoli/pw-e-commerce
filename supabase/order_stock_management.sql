@@ -6,6 +6,7 @@
 -- - Descuenta una sola vez cuando la orden pasa a "pagada", "enviada" o "entregada".
 -- - Repone stock si una orden ya descontada pasa a "cancelada" o vuelve a un estado no pagado.
 -- - Evita stock negativo con una excepcion clara.
+-- - Si se edita una linea de una orden ya descontada, ajusta stock por diferencia.
 
 alter table public.ordenes
 add column if not exists stock_descontado boolean not null default false;
@@ -148,21 +149,97 @@ declare
   v_orden_id bigint := coalesce(new.orden_id, old.orden_id);
   v_estado text;
   v_stock_descontado boolean;
+  v_delta int;
+  v_available_stock int;
+  v_product_name text;
 begin
   select estado::text, stock_descontado
   into v_estado, v_stock_descontado
   from public.ordenes
   where id = v_orden_id;
 
-  if v_estado not in ('pagada', 'enviada', 'entregada') then
+  if v_estado not in ('pagada', 'enviada', 'entregada') or not v_stock_descontado then
     return null;
   end if;
 
-  if v_stock_descontado then
-    perform public.reponer_stock_orden(v_orden_id);
+  if tg_op = 'INSERT' then
+    select stock, nombre
+    into v_available_stock, v_product_name
+    from public.productos
+    where id = new.producto_id
+    for update;
+
+    if v_available_stock < new.cantidad then
+      raise exception 'Stock insuficiente para %. Stock actual: %, requerido: %.',
+        v_product_name,
+        v_available_stock,
+        new.cantidad;
+    end if;
+
+    update public.productos
+    set stock = stock - new.cantidad
+    where id = new.producto_id;
+
+    return null;
   end if;
 
-  perform public.descontar_stock_orden(v_orden_id);
+  if tg_op = 'DELETE' then
+    update public.productos
+    set stock = stock + old.cantidad
+    where id = old.producto_id;
+
+    return null;
+  end if;
+
+  if old.producto_id = new.producto_id then
+    v_delta := new.cantidad - old.cantidad;
+
+    if v_delta > 0 then
+      select stock, nombre
+      into v_available_stock, v_product_name
+      from public.productos
+      where id = new.producto_id
+      for update;
+
+      if v_available_stock < v_delta then
+        raise exception 'Stock insuficiente para %. Stock actual: %, requerido adicional: %.',
+          v_product_name,
+          v_available_stock,
+          v_delta;
+      end if;
+
+      update public.productos
+      set stock = stock - v_delta
+      where id = new.producto_id;
+    elsif v_delta < 0 then
+      update public.productos
+      set stock = stock + abs(v_delta)
+      where id = new.producto_id;
+    end if;
+
+    return null;
+  end if;
+
+  update public.productos
+  set stock = stock + old.cantidad
+  where id = old.producto_id;
+
+  select stock, nombre
+  into v_available_stock, v_product_name
+  from public.productos
+  where id = new.producto_id
+  for update;
+
+  if v_available_stock < new.cantidad then
+    raise exception 'Stock insuficiente para %. Stock actual: %, requerido: %.',
+      v_product_name,
+      v_available_stock,
+      new.cantidad;
+  end if;
+
+  update public.productos
+  set stock = stock - new.cantidad
+  where id = new.producto_id;
 
   return null;
 end;

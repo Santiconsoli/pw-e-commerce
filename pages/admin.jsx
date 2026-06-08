@@ -71,6 +71,7 @@ export default function AdminPage() {
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   const [orderTotalDrafts, setOrderTotalDrafts] = useState({});
+  const [orderQuantityDrafts, setOrderQuantityDrafts] = useState({});
   const [productForm, setProductForm] = useState(emptyProductForm);
   const [manualOrderForm, setManualOrderForm] = useState(emptyManualOrderForm);
   const [manualOrderItems, setManualOrderItems] = useState([{ ...emptyManualOrderItem }]);
@@ -153,10 +154,14 @@ export default function AdminPage() {
           cliente_email,
           creado_en,
           detalles_orden (
+            id,
+            producto_id,
             cantidad,
             precio_unitario,
             productos (
-              nombre
+              id,
+              nombre,
+              stock
             )
           )
         `)
@@ -424,6 +429,97 @@ export default function AdminPage() {
       delete nextDrafts[order.id];
       return nextDrafts;
     });
+  };
+
+  const handleOrderQuantityDraftChange = (detailId, value) => {
+    setOrderQuantityDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [detailId]: value.replace(/\D/g, '').slice(0, 3)
+    }));
+  };
+
+  const handleOrderQuantitySave = async (order, detail) => {
+    if (!supabase || !isAdmin) {
+      showMessage('Necesitás permisos de administrador.');
+      return;
+    }
+
+    const draftValue = orderQuantityDrafts[detail.id] ?? String(detail.cantidad || 1);
+    const nextQuantity = Number.parseInt(draftValue.replace(/\D/g, ''), 10);
+    const currentQuantity = Number.parseInt(detail.cantidad || '0', 10);
+
+    if (!Number.isInteger(nextQuantity) || nextQuantity <= 0) {
+      showMessage('La cantidad debe ser mayor a cero.');
+      return;
+    }
+
+    if (nextQuantity === currentQuantity) {
+      setOrderQuantityDrafts((currentDrafts) => {
+        const nextDrafts = { ...currentDrafts };
+        delete nextDrafts[detail.id];
+        return nextDrafts;
+      });
+      return;
+    }
+
+    const paidStatus = paidOrderStatuses.includes(order.estado);
+    const product = products.find((currentProduct) => String(currentProduct.id) === String(detail.producto_id));
+    const availableStock = Number(product?.stock ?? detail.productos?.stock ?? 0);
+    const requiredStock = paidStatus ? Math.max(nextQuantity - currentQuantity, 0) : nextQuantity;
+
+    if (requiredStock > availableStock) {
+      showMessage(`Stock insuficiente. Disponible: ${availableStock}.`);
+      return;
+    }
+
+    const nextDetails = (order.detalles_orden || []).map((currentDetail) =>
+      currentDetail.id === detail.id ? { ...currentDetail, cantidad: nextQuantity } : currentDetail
+    );
+    const nextTotal = nextDetails.reduce(
+      (sum, currentDetail) => sum + Number(currentDetail.precio_unitario || 0) * Number(currentDetail.cantidad || 0),
+      0
+    );
+
+    setSaving(true);
+
+    const { error: detailError } = await supabase
+      .from('detalles_orden')
+      .update({ cantidad: nextQuantity })
+      .eq('id', detail.id);
+
+    if (detailError) {
+      setSaving(false);
+      showMessage(detailError.message || 'No pudimos actualizar la cantidad.');
+      return;
+    }
+
+    const { error: orderError } = await supabase
+      .from('ordenes')
+      .update({ total: nextTotal })
+      .eq('id', order.id);
+
+    if (orderError) {
+      setSaving(false);
+      showMessage(orderError.message || 'Cantidad actualizada, pero no pudimos recalcular el total.');
+      await loadAdminData(supabase, sessionUser);
+      return;
+    }
+
+    const { error: paymentError } = await supabase
+      .from('pagos')
+      .update({ monto: nextTotal })
+      .eq('orden_id', order.id);
+
+    setSaving(false);
+
+    setOrderQuantityDrafts((currentDrafts) => {
+      const nextDrafts = { ...currentDrafts };
+      delete nextDrafts[detail.id];
+      return nextDrafts;
+    });
+
+    await loadAdminData(supabase, sessionUser);
+    showMessage(paymentError ? 'Cantidad actualizada, pero no pudimos sincronizar pagos.' : 'Cantidad y total actualizados.');
   };
 
   const handleManualOrderChange = (event) => {
@@ -1057,8 +1153,26 @@ export default function AdminPage() {
                                   <td>
                                     <ul className="admin-order-products">
                                       {order.detalles_orden?.map((detail, index) => (
-                                        <li key={`${order.id}-${index}`}>
-                                          {detail.cantidad} x {detail.productos?.nombre || 'Producto'}
+                                        <li className="admin-order-line" key={detail.id || `${order.id}-${index}`}>
+                                          <label className="admin-quantity-field">
+                                            <span>Cant.</span>
+                                            <input
+                                              type="text"
+                                              inputMode="numeric"
+                                              value={orderQuantityDrafts[detail.id] ?? String(detail.cantidad || 1)}
+                                              onChange={(event) => handleOrderQuantityDraftChange(detail.id, event.target.value)}
+                                              onBlur={() => handleOrderQuantitySave(order, detail)}
+                                              onKeyDown={(event) => {
+                                                if (event.key === 'Enter') {
+                                                  event.preventDefault();
+                                                  event.currentTarget.blur();
+                                                }
+                                              }}
+                                              disabled={isSaving}
+                                              aria-label={`Modificar cantidad de ${detail.productos?.nombre || 'producto'}`}
+                                            />
+                                          </label>
+                                          <span>{detail.productos?.nombre || 'Producto'}</span>
                                         </li>
                                       ))}
                                     </ul>

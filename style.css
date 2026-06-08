@@ -2410,6 +2410,51 @@ main {
     list-style: none;
 }
 
+.admin-order-line {
+    display: grid;
+    grid-template-columns: auto minmax(120px, 1fr);
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-quantity-field {
+    display: inline-grid;
+    grid-template-columns: auto 48px;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-quantity-field span {
+    color: var(--text-muted);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.admin-quantity-field input {
+    width: 48px;
+    border: 1px solid rgba(212, 167, 73, 0.26);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.035);
+    padding: 8px 8px;
+    color: var(--text-white);
+    font: inherit;
+    font-weight: 900;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-quantity-field input:focus {
+    border-color: rgba(212, 167, 73, 0.78);
+    box-shadow: 0 0 0 4px rgba(212, 167, 73, 0.12);
+}
+
+.admin-quantity-field input:disabled {
+    opacity: 0.58;
+}
+
 .admin-orders-table td:first-child,
 .admin-orders-table td:nth-child(2) {
     min-width: 190px;
