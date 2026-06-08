@@ -138,7 +138,6 @@ export default function Home({ catalogProducts }) {
 
             <section className="reviews-section" aria-labelledby="reviews-title">
               <div className="reviews-heading">
-                <p className="eyebrow">Reseñas</p>
                 <h2 id="reviews-title">Opiniones de quienes ya viven 525hp</h2>
               </div>
 

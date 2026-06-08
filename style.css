@@ -810,17 +810,17 @@ main {
 
 .reviews-heading {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 28px;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 22px;
+    text-align: center;
 }
 
 .reviews-heading h2 {
-    max-width: 16ch;
-    font-size: clamp(2rem, 4vw, 3.6rem);
-    line-height: 0.98;
-    letter-spacing: -0.055em;
+    max-width: 18ch;
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
 }
 
 .reviews-grid {
@@ -2943,15 +2943,15 @@ main {
     }
 
     .reviews-heading {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 8px;
+        align-items: center;
+        justify-content: center;
         margin-bottom: 18px;
+        text-align: center;
     }
 
     .reviews-heading h2 {
-        max-width: 13ch;
-        font-size: clamp(2rem, 10vw, 3rem);
+        max-width: 15ch;
+        font-size: clamp(1.85rem, 8vw, 2.6rem);
     }
 
     .reviews-grid {
