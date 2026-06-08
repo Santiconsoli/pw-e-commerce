@@ -15,6 +15,24 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0
   }).format(value);
 
+const reviews = [
+  {
+    name: 'Martín Alvarez',
+    detail: 'Coleccionista Porsche',
+    text: 'La mesa BMW tiene una presencia increíble. Se nota pesada, precisa y terminada como una pieza de exhibición.'
+  },
+  {
+    name: 'Lucía Peralta',
+    detail: 'Interiorismo premium',
+    text: '525hp logra algo difícil: piezas con carácter automotor que igual se sienten elegantes dentro de un living moderno.'
+  },
+  {
+    name: 'Federico Ramos',
+    detail: 'Garage privado',
+    text: 'Compré el reloj McLaren y terminó siendo el detalle que todos preguntan cuando entran al espacio.'
+  }
+];
+
 export default function Home({ catalogProducts }) {
   const [isCartOpen, setCartOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -117,6 +135,26 @@ export default function Home({ catalogProducts }) {
                 <ProductCard key={product.id} product={product} formatPrice={formatPrice} onAdd={handleAdd} />
               ))}
             </div>
+
+            <section className="reviews-section" aria-labelledby="reviews-title">
+              <div className="reviews-heading">
+                <p className="eyebrow">Reseñas</p>
+                <h2 id="reviews-title">Opiniones de quienes ya viven 525hp</h2>
+              </div>
+
+              <div className="reviews-grid">
+                {reviews.map((review) => (
+                  <article className="review-card" key={review.name}>
+                    <div className="review-stars" aria-label="5 de 5 estrellas">★★★★★</div>
+                    <p className="review-text">“{review.text}”</p>
+                    <div>
+                      <h3>{review.name}</h3>
+                      <span>{review.detail}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
 
             <div className="brand-strip" aria-label="Marcas destacadas">
               <figure className="brand-logo-card" aria-label="Logo Porsche">
