@@ -13,6 +13,18 @@ const emptyProductForm = {
   categoria: '525hp'
 };
 
+const emptyManualOrderForm = {
+  userId: '',
+  status: 'pagada',
+  paymentMethod: 'transferencia',
+  reference: ''
+};
+
+const emptyManualOrderItem = {
+  productId: '',
+  quantity: '1'
+};
+
 const orderStatuses = ['pendiente', 'pagada', 'enviada', 'entregada', 'cancelada'];
 const paidOrderStatuses = ['pagada', 'enviada', 'entregada', 'confirmada'];
 
@@ -55,6 +67,8 @@ export default function AdminPage() {
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   const [productForm, setProductForm] = useState(emptyProductForm);
+  const [manualOrderForm, setManualOrderForm] = useState(emptyManualOrderForm);
+  const [manualOrderItems, setManualOrderItems] = useState([{ ...emptyManualOrderItem }]);
   const [editingProductId, setEditingProductId] = useState(null);
   const [activeTab, setActiveTab] = useState('productos');
   const [isLoading, setLoading] = useState(true);
@@ -74,6 +88,17 @@ export default function AdminPage() {
       revenue
     };
   }, [orders, products.length, users.length]);
+
+  const manualOrderTotal = useMemo(
+    () =>
+      manualOrderItems.reduce((sum, item) => {
+        const product = products.find((currentProduct) => String(currentProduct.id) === String(item.productId));
+        const quantity = Math.max(Number.parseInt(item.quantity || '0', 10), 0);
+
+        return sum + Number(product?.precio || 0) * quantity;
+      }, 0),
+    [manualOrderItems, products]
+  );
 
   const loadAdminData = async (client, user) => {
     setLoading(true);
@@ -220,6 +245,11 @@ export default function AdminPage() {
     setProductForm(emptyProductForm);
   };
 
+  const resetManualOrderForm = () => {
+    setManualOrderForm(emptyManualOrderForm);
+    setManualOrderItems([{ ...emptyManualOrderItem }]);
+  };
+
   const handleSaveProduct = async (event) => {
     event.preventDefault();
 
@@ -318,6 +348,124 @@ export default function AdminPage() {
       currentOrders.map((order) => (order.id === orderId ? { ...order, ...payload } : order))
     );
     showMessage('Estado de orden actualizado.');
+  };
+
+  const handleManualOrderChange = (event) => {
+    const { name, value } = event.target;
+    setManualOrderForm((currentForm) => ({ ...currentForm, [name]: value }));
+  };
+
+  const handleManualOrderItemChange = (index, field, value) => {
+    setManualOrderItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index
+          ? {
+              ...item,
+              [field]: field === 'quantity' ? value.replace(/\D/g, '').slice(0, 3) : value
+            }
+          : item
+      )
+    );
+  };
+
+  const handleAddManualOrderItem = () => {
+    setManualOrderItems((currentItems) => [...currentItems, { ...emptyManualOrderItem }]);
+  };
+
+  const handleRemoveManualOrderItem = (index) => {
+    setManualOrderItems((currentItems) =>
+      currentItems.length === 1 ? currentItems : currentItems.filter((_item, itemIndex) => itemIndex !== index)
+    );
+  };
+
+  const handleCreateManualOrder = async (event) => {
+    event.preventDefault();
+
+    if (!supabase || !isAdmin) {
+      showMessage('Necesitás permisos de administrador.');
+      return;
+    }
+
+    if (!manualOrderForm.userId) {
+      showMessage('Seleccioná un cliente para la orden.');
+      return;
+    }
+
+    const normalizedItems = manualOrderItems
+      .map((item) => {
+        const product = products.find((currentProduct) => String(currentProduct.id) === String(item.productId));
+        const quantity = Math.max(Number.parseInt(item.quantity || '0', 10), 0);
+
+        return product && quantity > 0
+          ? {
+              product,
+              quantity,
+              unitPrice: Number(product.precio || 0)
+            }
+          : null;
+      })
+      .filter(Boolean);
+
+    if (!normalizedItems.length) {
+      showMessage('Agregá al menos un producto válido.');
+      return;
+    }
+
+    const total = normalizedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+    if (total <= 0) {
+      showMessage('El total de la orden debe ser mayor a cero.');
+      return;
+    }
+
+    setSaving(true);
+
+    const paidStatus = ['pagada', 'enviada', 'entregada'].includes(manualOrderForm.status);
+    const reference =
+      manualOrderForm.reference.trim() ||
+      `MANUAL-525-${Math.random().toString(16).slice(2, 8).toUpperCase()}`;
+
+    const { data: createdOrder, error: orderError } = await supabase
+      .from('ordenes')
+      .insert({
+        usuario_id: manualOrderForm.userId,
+        total,
+        estado: manualOrderForm.status,
+        metodo_pago: manualOrderForm.paymentMethod,
+        referencia_pago: reference,
+        pagado_en: paidStatus ? new Date().toISOString() : null
+      })
+      .select('id')
+      .single();
+
+    if (orderError || !createdOrder?.id) {
+      setSaving(false);
+      showMessage(orderError?.message || 'No pudimos crear la orden manual.');
+      return;
+    }
+
+    const detailsPayload = normalizedItems.map((item) => ({
+      orden_id: createdOrder.id,
+      producto_id: item.product.id,
+      cantidad: item.quantity,
+      precio_unitario: item.unitPrice
+    }));
+
+    const { error: detailsError } = await supabase
+      .from('detalles_orden')
+      .insert(detailsPayload);
+
+    if (detailsError) {
+      await supabase.from('ordenes').delete().eq('id', createdOrder.id);
+      setSaving(false);
+      showMessage(detailsError.message || 'No pudimos cargar los productos de la orden.');
+      return;
+    }
+
+    resetManualOrderForm();
+    await loadAdminData(supabase, sessionUser);
+    setSaving(false);
+    showMessage('Orden manual creada correctamente.');
   };
 
   const handleSyncPaidOrders = async () => {
@@ -599,6 +747,135 @@ export default function AdminPage() {
                             Sincronizar pagos
                           </button>
                         </div>
+
+                        <form className="admin-manual-order-form" onSubmit={handleCreateManualOrder}>
+                          <div className="admin-manual-order-head">
+                            <div>
+                              <p className="eyebrow">Carga manual</p>
+                              <h3>Crear orden sin checkout</h3>
+                            </div>
+                            <strong>{formatPrice(manualOrderTotal)}</strong>
+                          </div>
+
+                          <div className="admin-manual-order-grid">
+                            <label className="checkout-field">
+                              <span>Cliente</span>
+                              <select
+                                name="userId"
+                                value={manualOrderForm.userId}
+                                onChange={handleManualOrderChange}
+                                required
+                              >
+                                <option value="">Seleccionar cliente</option>
+                                {users.map((user) => (
+                                  <option key={user.id} value={user.id}>
+                                    {[user.nombre, user.apellido].filter(Boolean).join(' ') || user.email || user.id}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+
+                            <label className="checkout-field">
+                              <span>Estado</span>
+                              <select
+                                name="status"
+                                value={manualOrderForm.status}
+                                onChange={handleManualOrderChange}
+                              >
+                                {orderStatuses.map((status) => (
+                                  <option key={status} value={status}>{status}</option>
+                                ))}
+                              </select>
+                            </label>
+
+                            <label className="checkout-field">
+                              <span>Método de pago</span>
+                              <select
+                                name="paymentMethod"
+                                value={manualOrderForm.paymentMethod}
+                                onChange={handleManualOrderChange}
+                              >
+                                <option value="transferencia">transferencia</option>
+                                <option value="efectivo">efectivo</option>
+                                <option value="tarjeta">tarjeta</option>
+                                <option value="mercadopago">mercadopago</option>
+                                <option value="otro">otro</option>
+                              </select>
+                            </label>
+
+                            <label className="checkout-field">
+                              <span>Referencia opcional</span>
+                              <input
+                                name="reference"
+                                value={manualOrderForm.reference}
+                                onChange={handleManualOrderChange}
+                                placeholder="MANUAL-525-001"
+                                maxLength={255}
+                              />
+                            </label>
+                          </div>
+
+                          <div className="admin-manual-items">
+                            {manualOrderItems.map((item, index) => {
+                              const selectedProduct = products.find((product) => String(product.id) === String(item.productId));
+                              const quantity = Math.max(Number.parseInt(item.quantity || '0', 10), 0);
+
+                              return (
+                                <div className="admin-manual-item" key={`manual-item-${index}`}>
+                                  <label className="checkout-field">
+                                    <span>Producto</span>
+                                    <select
+                                      value={item.productId}
+                                      onChange={(event) => handleManualOrderItemChange(index, 'productId', event.target.value)}
+                                      required
+                                    >
+                                      <option value="">Seleccionar producto</option>
+                                      {products.map((product) => (
+                                        <option key={product.id} value={product.id}>
+                                          {product.nombre} - {formatPrice(product.precio)}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </label>
+
+                                  <label className="checkout-field">
+                                    <span>Cantidad</span>
+                                    <input
+                                      type="text"
+                                      inputMode="numeric"
+                                      value={item.quantity}
+                                      onChange={(event) => handleManualOrderItemChange(index, 'quantity', event.target.value)}
+                                      required
+                                    />
+                                  </label>
+
+                                  <div className="admin-manual-item-total">
+                                    <span>Subtotal</span>
+                                    <strong>{formatPrice(Number(selectedProduct?.precio || 0) * quantity)}</strong>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    className="admin-manual-remove"
+                                    onClick={() => handleRemoveManualOrderItem(index)}
+                                    disabled={manualOrderItems.length === 1}
+                                  >
+                                    Quitar
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <div className="admin-manual-actions">
+                            <button type="button" className="checkout-secondary-btn" onClick={handleAddManualOrderItem}>
+                              Agregar producto
+                            </button>
+                            <button type="submit" className="checkout-primary-btn" disabled={isSaving}>
+                              {isSaving ? 'Creando...' : 'Crear orden manual'}
+                            </button>
+                          </div>
+                        </form>
 
                         <div className="admin-table-scroll">
                           <table className="admin-table admin-orders-table">
