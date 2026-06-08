@@ -2006,7 +2006,7 @@ main {
 
 .admin-manual-order-grid {
     display: grid;
-    grid-template-columns: minmax(220px, 1.25fr) repeat(3, minmax(150px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
 }
 

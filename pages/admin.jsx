@@ -15,6 +15,8 @@ const emptyProductForm = {
 
 const emptyManualOrderForm = {
   userId: '',
+  customerName: '',
+  customerEmail: '',
   status: 'pagada',
   paymentMethod: 'transferencia',
   reference: ''
@@ -29,6 +31,7 @@ const orderStatuses = ['pendiente', 'pagada', 'enviada', 'entregada', 'cancelada
 const paidOrderStatuses = ['pagada', 'enviada', 'entregada', 'confirmada'];
 
 const normalizeOrderStatus = (status) => (status === 'confirmada' ? 'pagada' : status);
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('es-AR', {
@@ -144,6 +147,8 @@ export default function AdminPage() {
           mercadopago_payment_id,
           pagado_en,
           usuario_id,
+          cliente_nombre,
+          cliente_email,
           creado_en,
           detalles_orden (
             cantidad,
@@ -387,8 +392,17 @@ export default function AdminPage() {
       return;
     }
 
-    if (!manualOrderForm.userId) {
-      showMessage('Seleccioná un cliente para la orden.');
+    const selectedUser = users.find((user) => user.id === manualOrderForm.userId);
+    const manualCustomerName = manualOrderForm.customerName.trim();
+    const manualCustomerEmail = manualOrderForm.customerEmail.trim().toLowerCase();
+
+    if (!selectedUser && manualCustomerName.length < 3) {
+      showMessage('Ingresá el nombre del cliente manual.');
+      return;
+    }
+
+    if (!selectedUser && !isValidEmail(manualCustomerEmail)) {
+      showMessage('Ingresá un email válido para el cliente manual.');
       return;
     }
 
@@ -429,7 +443,11 @@ export default function AdminPage() {
     const { data: createdOrder, error: orderError } = await supabase
       .from('ordenes')
       .insert({
-        usuario_id: manualOrderForm.userId,
+        usuario_id: selectedUser?.id || null,
+        cliente_nombre: selectedUser
+          ? [selectedUser.nombre, selectedUser.apellido].filter(Boolean).join(' ') || selectedUser.email
+          : manualCustomerName,
+        cliente_email: selectedUser?.email || manualCustomerEmail,
         total,
         estado: manualOrderForm.status,
         metodo_pago: manualOrderForm.paymentMethod,
@@ -778,59 +796,83 @@ export default function AdminPage() {
 
                               <div className="admin-manual-order-grid">
                                 <label className="checkout-field">
-                              <span>Cliente</span>
-                              <select
-                                name="userId"
-                                value={manualOrderForm.userId}
-                                onChange={handleManualOrderChange}
-                                required
-                              >
-                                <option value="">Seleccionar cliente</option>
-                                {users.map((user) => (
-                                  <option key={user.id} value={user.id}>
-                                    {[user.nombre, user.apellido].filter(Boolean).join(' ') || user.email || user.id}
-                                  </option>
-                                ))}
-                              </select>
+                                  <span>Usuario existente opcional</span>
+                                  <select
+                                    name="userId"
+                                    value={manualOrderForm.userId}
+                                    onChange={handleManualOrderChange}
+                                  >
+                                    <option value="">Cliente manual</option>
+                                    {users.map((user) => (
+                                      <option key={user.id} value={user.id}>
+                                        {[user.nombre, user.apellido].filter(Boolean).join(' ') || user.email || user.id}
+                                      </option>
+                                    ))}
+                                  </select>
                                 </label>
 
                                 <label className="checkout-field">
-                              <span>Estado</span>
-                              <select
-                                name="status"
-                                value={manualOrderForm.status}
-                                onChange={handleManualOrderChange}
-                              >
-                                {orderStatuses.map((status) => (
-                                  <option key={status} value={status}>{status}</option>
-                                ))}
-                              </select>
+                                  <span>Nombre manual</span>
+                                  <input
+                                    name="customerName"
+                                    value={manualOrderForm.customerName}
+                                    onChange={handleManualOrderChange}
+                                    placeholder="Nombre del cliente"
+                                    maxLength={160}
+                                    disabled={Boolean(manualOrderForm.userId)}
+                                  />
                                 </label>
 
                                 <label className="checkout-field">
-                              <span>Método de pago</span>
-                              <select
-                                name="paymentMethod"
-                                value={manualOrderForm.paymentMethod}
-                                onChange={handleManualOrderChange}
-                              >
-                                <option value="transferencia">transferencia</option>
-                                <option value="efectivo">efectivo</option>
-                                <option value="tarjeta">tarjeta</option>
-                                <option value="mercadopago">mercadopago</option>
-                                <option value="otro">otro</option>
-                              </select>
+                                  <span>Email manual</span>
+                                  <input
+                                    name="customerEmail"
+                                    type="email"
+                                    value={manualOrderForm.customerEmail}
+                                    onChange={handleManualOrderChange}
+                                    placeholder="cliente@email.com"
+                                    maxLength={180}
+                                    disabled={Boolean(manualOrderForm.userId)}
+                                  />
                                 </label>
 
                                 <label className="checkout-field">
-                              <span>Referencia opcional</span>
-                              <input
-                                name="reference"
-                                value={manualOrderForm.reference}
-                                onChange={handleManualOrderChange}
-                                placeholder="MANUAL-525-001"
-                                maxLength={255}
-                              />
+                                  <span>Estado</span>
+                                  <select
+                                    name="status"
+                                    value={manualOrderForm.status}
+                                    onChange={handleManualOrderChange}
+                                  >
+                                    {orderStatuses.map((status) => (
+                                      <option key={status} value={status}>{status}</option>
+                                    ))}
+                                  </select>
+                                </label>
+
+                                <label className="checkout-field">
+                                  <span>Método de pago</span>
+                                  <select
+                                    name="paymentMethod"
+                                    value={manualOrderForm.paymentMethod}
+                                    onChange={handleManualOrderChange}
+                                  >
+                                    <option value="transferencia">transferencia</option>
+                                    <option value="efectivo">efectivo</option>
+                                    <option value="tarjeta">tarjeta</option>
+                                    <option value="mercadopago">mercadopago</option>
+                                    <option value="otro">otro</option>
+                                  </select>
+                                </label>
+
+                                <label className="checkout-field">
+                                  <span>Referencia opcional</span>
+                                  <input
+                                    name="reference"
+                                    value={manualOrderForm.reference}
+                                    onChange={handleManualOrderChange}
+                                    placeholder="MANUAL-525-001"
+                                    maxLength={255}
+                                  />
                                 </label>
                               </div>
 
@@ -919,9 +961,11 @@ export default function AdminPage() {
                                   </td>
                                   <td>
                                     <strong>
-                                      {[order.usuarios?.nombre, order.usuarios?.apellido].filter(Boolean).join(' ') || 'Cliente'}
+                                      {[order.usuarios?.nombre, order.usuarios?.apellido].filter(Boolean).join(' ') ||
+                                        order.cliente_nombre ||
+                                        'Cliente manual'}
                                     </strong>
-                                    <span>{order.usuarios?.email || 'Sin email'}</span>
+                                    <span>{order.usuarios?.email || order.cliente_email || 'Sin email'}</span>
                                   </td>
                                   <td>
                                     <ul className="admin-order-products">

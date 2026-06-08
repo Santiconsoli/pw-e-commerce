@@ -150,7 +150,9 @@ on public.carrito (producto_id);
 -- 5. Tabla ordenes
 create table if not exists public.ordenes (
   id bigint primary key generated always as identity,
-  usuario_id uuid not null references auth.users(id) on delete cascade,
+  usuario_id uuid references auth.users(id) on delete cascade,
+  cliente_nombre varchar(180),
+  cliente_email varchar(255),
   total decimal(10, 2) not null default 0 check (total >= 0),
   estado public.estado_orden not null default 'pendiente',
   metodo_pago varchar(50),
@@ -161,6 +163,9 @@ create table if not exists public.ordenes (
 
 create index if not exists idx_ordenes_usuario_id
 on public.ordenes (usuario_id);
+
+create index if not exists idx_ordenes_cliente_email
+on public.ordenes (cliente_email);
 
 create index if not exists idx_ordenes_estado
 on public.ordenes (estado);
