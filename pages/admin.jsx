@@ -13,7 +13,10 @@ const emptyProductForm = {
   categoria: '525hp'
 };
 
-const orderStatuses = ['pendiente', 'pagada', 'confirmada', 'enviada', 'entregada', 'cancelada'];
+const orderStatuses = ['pendiente', 'pagada', 'enviada', 'entregada', 'cancelada'];
+const paidOrderStatuses = ['pagada', 'enviada', 'entregada', 'confirmada'];
+
+const normalizeOrderStatus = (status) => (status === 'confirmada' ? 'pagada' : status);
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('es-AR', {
@@ -61,7 +64,7 @@ export default function AdminPage() {
   const isAdmin = profile?.rol === 'admin';
 
   const adminStats = useMemo(() => {
-    const paidOrders = orders.filter((order) => order.estado === 'pagada' || order.estado === 'entregada');
+    const paidOrders = orders.filter((order) => paidOrderStatuses.includes(order.estado));
     const revenue = paidOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
 
     return {
@@ -294,9 +297,11 @@ export default function AdminPage() {
       return;
     }
 
+    const currentOrder = orders.find((order) => order.id === orderId);
+    const paidStatus = ['pagada', 'enviada', 'entregada'].includes(nextStatus);
     const payload = {
       estado: nextStatus,
-      pagado_en: nextStatus === 'pagada' ? new Date().toISOString() : null
+      pagado_en: paidStatus ? currentOrder?.pagado_en || new Date().toISOString() : null
     };
 
     const { error } = await supabase
@@ -632,8 +637,8 @@ export default function AdminPage() {
                                   <td>{formatPrice(order.total)}</td>
                                   <td>
                                     <select
-                                      className="admin-status-select"
-                                      value={order.estado}
+                                      className={`admin-status-select admin-status-${normalizeOrderStatus(order.estado)}`}
+                                      value={normalizeOrderStatus(order.estado)}
                                       onChange={(event) => handleOrderStatusChange(order.id, event.target.value)}
                                     >
                                       {orderStatuses.map((status) => (

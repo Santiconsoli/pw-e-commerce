@@ -2011,11 +2011,47 @@ main {
     color: var(--text-white);
     font: inherit;
     font-weight: 800;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .admin-status-select:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+}
+
+.admin-status-pendiente {
+    border-color: rgba(212, 167, 73, 0.75);
+    background: rgba(212, 167, 73, 0.12);
+    color: #f2d38a;
+    box-shadow: inset 0 0 0 1px rgba(212, 167, 73, 0.18);
+}
+
+.admin-status-pagada {
+    border-color: rgba(35, 197, 120, 0.78);
+    background: rgba(35, 197, 120, 0.12);
+    color: #8ff0bb;
+    box-shadow: inset 0 0 0 1px rgba(35, 197, 120, 0.18);
+}
+
+.admin-status-enviada {
+    border-color: rgba(43, 210, 216, 0.76);
+    background: rgba(43, 210, 216, 0.12);
+    color: #9eeff2;
+    box-shadow: inset 0 0 0 1px rgba(43, 210, 216, 0.18);
+}
+
+.admin-status-entregada {
+    border-color: rgba(180, 130, 255, 0.78);
+    background: rgba(180, 130, 255, 0.13);
+    color: #d8c0ff;
+    box-shadow: inset 0 0 0 1px rgba(180, 130, 255, 0.18);
+}
+
+.admin-status-cancelada {
+    border-color: rgba(255, 90, 90, 0.78);
+    background: rgba(255, 90, 90, 0.12);
+    color: #ffb1b1;
+    box-shadow: inset 0 0 0 1px rgba(255, 90, 90, 0.18);
 }
 
 .admin-order-products {

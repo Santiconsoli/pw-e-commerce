@@ -97,7 +97,7 @@ begin
   values (
     target_user_id,
     reloj_price,
-    'confirmada',
+    'pagada',
     'tarjeta',
     'DEMO-525-002',
     now() - interval '4 days',

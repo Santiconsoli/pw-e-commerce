@@ -8,7 +8,6 @@ begin
     create type public.estado_orden as enum (
       'pendiente',
       'pagada',
-      'confirmada',
       'enviada',
       'entregada',
       'cancelada'
