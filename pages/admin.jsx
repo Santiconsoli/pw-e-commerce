@@ -71,6 +71,7 @@ export default function AdminPage() {
   const [manualOrderItems, setManualOrderItems] = useState([{ ...emptyManualOrderItem }]);
   const [editingProductId, setEditingProductId] = useState(null);
   const [activeTab, setActiveTab] = useState('productos');
+  const [isManualOrderOpen, setManualOrderOpen] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [isSaving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -465,6 +466,7 @@ export default function AdminPage() {
     resetManualOrderForm();
     await loadAdminData(supabase, sessionUser);
     setSaving(false);
+    setManualOrderOpen(false);
     showMessage('Orden manual creada correctamente.');
   };
 
@@ -748,17 +750,34 @@ export default function AdminPage() {
                           </button>
                         </div>
 
-                        <form className="admin-manual-order-form" onSubmit={handleCreateManualOrder}>
-                          <div className="admin-manual-order-head">
-                            <div>
-                              <p className="eyebrow">Carga manual</p>
-                              <h3>Crear orden sin checkout</h3>
-                            </div>
-                            <strong>{formatPrice(manualOrderTotal)}</strong>
-                          </div>
+                        <div className={`admin-manual-order-menu ${isManualOrderOpen ? 'is-open' : ''}`}>
+                          <button
+                            type="button"
+                            className="admin-manual-toggle"
+                            aria-expanded={isManualOrderOpen}
+                            onClick={() => setManualOrderOpen((isOpen) => !isOpen)}
+                          >
+                            <span>
+                              <small>Carga manual</small>
+                              <strong>Crear orden sin checkout</strong>
+                            </span>
+                            <span className="admin-manual-toggle-meta">
+                              {formatPrice(manualOrderTotal)}
+                              <b aria-hidden="true">{isManualOrderOpen ? '−' : '+'}</b>
+                            </span>
+                          </button>
 
-                          <div className="admin-manual-order-grid">
-                            <label className="checkout-field">
+                          {isManualOrderOpen && (
+                            <form className="admin-manual-order-form" onSubmit={handleCreateManualOrder}>
+                              <div className="admin-manual-order-head">
+                                <div>
+                                  <p className="eyebrow">Nueva orden</p>
+                                  <h3>Datos principales</h3>
+                                </div>
+                              </div>
+
+                              <div className="admin-manual-order-grid">
+                                <label className="checkout-field">
                               <span>Cliente</span>
                               <select
                                 name="userId"
@@ -773,9 +792,9 @@ export default function AdminPage() {
                                   </option>
                                 ))}
                               </select>
-                            </label>
+                                </label>
 
-                            <label className="checkout-field">
+                                <label className="checkout-field">
                               <span>Estado</span>
                               <select
                                 name="status"
@@ -786,9 +805,9 @@ export default function AdminPage() {
                                   <option key={status} value={status}>{status}</option>
                                 ))}
                               </select>
-                            </label>
+                                </label>
 
-                            <label className="checkout-field">
+                                <label className="checkout-field">
                               <span>Método de pago</span>
                               <select
                                 name="paymentMethod"
@@ -801,9 +820,9 @@ export default function AdminPage() {
                                 <option value="mercadopago">mercadopago</option>
                                 <option value="otro">otro</option>
                               </select>
-                            </label>
+                                </label>
 
-                            <label className="checkout-field">
+                                <label className="checkout-field">
                               <span>Referencia opcional</span>
                               <input
                                 name="reference"
@@ -812,10 +831,10 @@ export default function AdminPage() {
                                 placeholder="MANUAL-525-001"
                                 maxLength={255}
                               />
-                            </label>
-                          </div>
+                                </label>
+                              </div>
 
-                          <div className="admin-manual-items">
+                              <div className="admin-manual-items">
                             {manualOrderItems.map((item, index) => {
                               const selectedProduct = products.find((product) => String(product.id) === String(item.productId));
                               const quantity = Math.max(Number.parseInt(item.quantity || '0', 10), 0);
@@ -865,17 +884,19 @@ export default function AdminPage() {
                                 </div>
                               );
                             })}
-                          </div>
+                              </div>
 
-                          <div className="admin-manual-actions">
+                              <div className="admin-manual-actions">
                             <button type="button" className="checkout-secondary-btn" onClick={handleAddManualOrderItem}>
                               Agregar producto
                             </button>
                             <button type="submit" className="checkout-primary-btn" disabled={isSaving}>
                               {isSaving ? 'Creando...' : 'Crear orden manual'}
                             </button>
-                          </div>
-                        </form>
+                              </div>
+                            </form>
+                          )}
+                        </div>
 
                         <div className="admin-table-scroll">
                           <table className="admin-table admin-orders-table">
