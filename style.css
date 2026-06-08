@@ -2329,6 +2329,44 @@ main {
     cursor: not-allowed;
 }
 
+.admin-total-field {
+    display: grid;
+    gap: 7px;
+    min-width: 142px;
+}
+
+.admin-total-field span {
+    color: var(--text-muted);
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.admin-total-field input {
+    width: 100%;
+    border: 1px solid rgba(212, 167, 73, 0.28);
+    border-radius: 999px;
+    background:
+        linear-gradient(135deg, rgba(212, 167, 73, 0.08), rgba(255, 255, 255, 0.02)),
+        #0d0d0d;
+    padding: 10px 12px;
+    color: var(--text-white);
+    font: inherit;
+    font-weight: 900;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-total-field input:focus {
+    border-color: rgba(212, 167, 73, 0.78);
+    box-shadow: 0 0 0 4px rgba(212, 167, 73, 0.12);
+}
+
+.admin-total-field input:disabled {
+    opacity: 0.58;
+}
+
 .admin-status-pendiente {
     border-color: rgba(212, 167, 73, 0.75);
     background: rgba(212, 167, 73, 0.12);

@@ -32,6 +32,7 @@ const paidOrderStatuses = ['pagada', 'enviada', 'entregada', 'confirmada'];
 
 const normalizeOrderStatus = (status) => (status === 'confirmada' ? 'pagada' : status);
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const normalizeMoneyDraft = (value) => value.replace(/\D/g, '').slice(0, 10);
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('es-AR', {
@@ -69,6 +70,7 @@ export default function AdminPage() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
+  const [orderTotalDrafts, setOrderTotalDrafts] = useState({});
   const [productForm, setProductForm] = useState(emptyProductForm);
   const [manualOrderForm, setManualOrderForm] = useState(emptyManualOrderForm);
   const [manualOrderItems, setManualOrderItems] = useState([{ ...emptyManualOrderItem }]);
@@ -354,6 +356,74 @@ export default function AdminPage() {
       currentOrders.map((order) => (order.id === orderId ? { ...order, ...payload } : order))
     );
     showMessage('Estado de orden actualizado.');
+  };
+
+  const handleOrderTotalDraftChange = (orderId, value) => {
+    setOrderTotalDrafts((currentDrafts) => ({
+      ...currentDrafts,
+      [orderId]: normalizeMoneyDraft(value)
+    }));
+  };
+
+  const handleOrderTotalSave = async (order) => {
+    if (!supabase || !isAdmin) {
+      showMessage('Necesitás permisos de administrador.');
+      return;
+    }
+
+    const draftValue = orderTotalDrafts[order.id] ?? String(Math.round(Number(order.total || 0)));
+    const nextTotal = Number.parseInt(normalizeMoneyDraft(draftValue), 10);
+
+    if (!Number.isFinite(nextTotal) || nextTotal <= 0) {
+      showMessage('Ingresá un monto válido mayor a cero.');
+      return;
+    }
+
+    if (nextTotal === Math.round(Number(order.total || 0))) {
+      setOrderTotalDrafts((currentDrafts) => {
+        const nextDrafts = { ...currentDrafts };
+        delete nextDrafts[order.id];
+        return nextDrafts;
+      });
+      return;
+    }
+
+    setSaving(true);
+
+    const { error: orderError } = await supabase
+      .from('ordenes')
+      .update({ total: nextTotal })
+      .eq('id', order.id);
+
+    if (orderError) {
+      setSaving(false);
+      showMessage(orderError.message || 'No pudimos actualizar el monto de la orden.');
+      return;
+    }
+
+    const { error: paymentError } = await supabase
+      .from('pagos')
+      .update({ monto: nextTotal })
+      .eq('orden_id', order.id);
+
+    setSaving(false);
+
+    if (paymentError) {
+      showMessage('Monto de orden actualizado, pero no pudimos sincronizar pagos.');
+    } else {
+      showMessage('Monto pagado actualizado.');
+    }
+
+    setOrders((currentOrders) =>
+      currentOrders.map((currentOrder) =>
+        currentOrder.id === order.id ? { ...currentOrder, total: nextTotal } : currentOrder
+      )
+    );
+    setOrderTotalDrafts((currentDrafts) => {
+      const nextDrafts = { ...currentDrafts };
+      delete nextDrafts[order.id];
+      return nextDrafts;
+    });
   };
 
   const handleManualOrderChange = (event) => {
@@ -993,7 +1063,27 @@ export default function AdminPage() {
                                       ))}
                                     </ul>
                                   </td>
-                                  <td>{formatPrice(order.total)}</td>
+                                  <td>
+                                    <label className="admin-total-field">
+                                      <span>Monto pagado</span>
+                                      <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={orderTotalDrafts[order.id] ?? String(Math.round(Number(order.total || 0)))}
+                                        onChange={(event) => handleOrderTotalDraftChange(order.id, event.target.value)}
+                                        onBlur={() => handleOrderTotalSave(order)}
+                                        onKeyDown={(event) => {
+                                          if (event.key === 'Enter') {
+                                            event.preventDefault();
+                                            event.currentTarget.blur();
+                                          }
+                                        }}
+                                        disabled={isSaving}
+                                        aria-label={`Modificar monto pagado de la orden ${order.referencia_pago || order.id}`}
+                                      />
+                                    </label>
+                                    <small>{formatPrice(order.total)}</small>
+                                  </td>
                                   <td>
                                     <select
                                       className={`admin-status-select admin-status-${normalizeOrderStatus(order.estado)}`}
