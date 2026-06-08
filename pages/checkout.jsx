@@ -120,6 +120,12 @@ export default function CheckoutPage() {
     setToastTimer(timer);
   };
 
+  const clearCartAndGoHome = () => {
+    localStorage.removeItem(CART_STORAGE_KEY);
+    setCartItems([]);
+    router.replace('/');
+  };
+
   useEffect(() => {
     if (!router.isReady || !router.query.payment) {
       return;
@@ -132,8 +138,7 @@ export default function CheckoutPage() {
     };
 
     if (router.query.payment === 'success') {
-      localStorage.removeItem(CART_STORAGE_KEY);
-      setCartItems([]);
+      return;
     }
 
     showToast(messages[router.query.payment] || 'Volviste del proceso de pago.');
@@ -141,6 +146,9 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!router.isReady || !router.query.payment || !router.query.order) {
+      if (router.isReady && router.query.payment === 'success') {
+        clearCartAndGoHome();
+      }
       return;
     }
 
@@ -167,11 +175,16 @@ export default function CheckoutPage() {
     })
       .then((response) => response.json().catch(() => ({})))
       .then((data) => {
-        if (data.orderStatus === 'pagada') {
-          showToast('Pago confirmado. Tu compra ya quedó registrada.');
+        if (router.query.payment === 'success' || data.orderStatus === 'pagada') {
+          clearCartAndGoHome();
         }
       })
       .catch(() => {
+        if (router.query.payment === 'success') {
+          clearCartAndGoHome();
+          return;
+        }
+
         showToast('El pago quedó iniciado. Estamos esperando la confirmación.');
       });
   }, [router.isReady, router.query.payment, router.query.order]);

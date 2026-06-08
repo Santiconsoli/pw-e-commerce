@@ -36,7 +36,7 @@ export default function LoginPage() {
   const [isAccountLoading, setAccountLoading] = useState(false);
   const [accountError, setAccountError] = useState('');
 
-  const nextPath = typeof router.query.next === 'string' ? router.query.next : '/checkout';
+  const nextPath = typeof router.query.next === 'string' ? router.query.next : '/';
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
 
   const getRedirectUrl = () => {

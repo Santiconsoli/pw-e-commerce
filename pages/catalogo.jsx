@@ -8,13 +8,6 @@ import { products as fallbackProducts } from '../data/products';
 import { useCart } from '../hooks/useCart';
 import { getProductsFromSupabase } from '../lib/supabase/products';
 
-const formatPrice = (value) =>
-  new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0
-  }).format(value);
-
 export default function CatalogPage({ catalogProducts }) {
   const [isCartOpen, setCartOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -75,10 +68,12 @@ export default function CatalogPage({ catalogProducts }) {
       });
   }, [catalogProducts, searchTerm, sortMode]);
 
-  const lowestPrice = useMemo(
-    () => catalogProducts.reduce((min, product) => Math.min(min, product.price), catalogProducts[0]?.price || 0),
-    [catalogProducts]
-  );
+  const formatPrice = (value) =>
+    new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      maximumFractionDigits: 0
+    }).format(value);
 
   return (
     <>
@@ -112,27 +107,8 @@ export default function CatalogPage({ catalogProducts }) {
               <span className="hero-line hero-line-red"></span>
             </div>
 
-            <div className="container catalog-hero-layout">
-              <div className="catalog-hero-copy">
-                <p className="eyebrow">Catálogo 525hp</p>
-                <h1>Objetos con ADN de pista</h1>
-                <p>
-                  Una selección curada de piezas automotrices reinterpretadas como mobiliario y objetos de presencia.
-                </p>
-              </div>
-
-              <aside className="catalog-hero-stat" aria-label="Resumen del catálogo">
-                <span>{catalogProducts.length}</span>
-                <p>Piezas activas</p>
-                <strong>Desde {formatPrice(lowestPrice)}</strong>
-                <small>Elegí tu próxima pieza de colección.</small>
-              </aside>
-            </div>
-          </section>
-
-          <section className="catalog-section">
             <div className="container">
-              <div className="catalog-toolbar">
+              <div className="catalog-toolbar catalog-toolbar-top">
                 <label className="catalog-search">
                   <span>Buscar pieza</span>
                   <input
@@ -154,9 +130,22 @@ export default function CatalogPage({ catalogProducts }) {
                 </label>
               </div>
 
+              <div className="catalog-hero-layout">
+                <div className="catalog-hero-copy">
+                  <p className="eyebrow">Catálogo 525hp</p>
+                  <h1>Objetos con ADN de pista</h1>
+                  <p>
+                    Una selección curada de piezas automotrices reinterpretadas como mobiliario y objetos de presencia.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="catalog-section">
+            <div className="container">
               <div className="catalog-results-heading">
                 <div>
-                  <p className="eyebrow">La colección</p>
                   <h2>
                     {filteredProducts.length} {filteredProducts.length === 1 ? 'pieza encontrada' : 'piezas encontradas'}
                   </h2>
