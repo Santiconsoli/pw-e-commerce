@@ -463,65 +463,33 @@ export default function AdminPage() {
       return;
     }
 
-    const paidStatus = paidOrderStatuses.includes(order.estado);
-    const paidAndAlreadyDiscounted = paidStatus && order.stock_descontado;
-    const product = products.find((currentProduct) => String(currentProduct.id) === String(detail.producto_id));
-    const availableStock = Number(product?.stock ?? detail.productos?.stock ?? 0);
-    const requiredStock = paidAndAlreadyDiscounted ? Math.max(nextQuantity - currentQuantity, 0) : nextQuantity;
-
-    if (requiredStock > availableStock) {
-      showMessage(`Stock insuficiente. Disponible: ${availableStock}.`);
-      return;
-    }
-
-    const nextDetails = (order.detalles_orden || []).map((currentDetail) =>
-      currentDetail.id === detail.id ? { ...currentDetail, cantidad: nextQuantity } : currentDetail
-    );
-    const nextTotal = nextDetails.reduce(
-      (sum, currentDetail) => sum + Number(currentDetail.precio_unitario || 0) * Number(currentDetail.cantidad || 0),
-      0
-    );
-
     setSaving(true);
 
-    const { error: detailError } = await supabase
-      .from('detalles_orden')
-      .update({ cantidad: nextQuantity })
-      .eq('id', detail.id);
+    const { data, error } = await supabase.rpc('admin_actualizar_cantidad_detalle_orden', {
+      p_detalle_id: detail.id,
+      p_cantidad: nextQuantity
+    });
 
-    if (detailError) {
+    if (error) {
       setSaving(false);
-      showMessage(detailError.message || 'No pudimos actualizar la cantidad.');
+      showMessage(error.message || 'No pudimos actualizar cantidad, total y stock.');
+
+      if (error.message?.includes('admin_actualizar_cantidad_detalle_orden')) {
+        showMessage('Falta actualizar el SQL de stock en Supabase.');
+      }
       return;
     }
 
-    const { error: orderError } = await supabase
-      .from('ordenes')
-      .update({ total: nextTotal })
-      .eq('id', order.id);
-
-    if (orderError) {
-      setSaving(false);
-      showMessage(orderError.message || 'Cantidad actualizada, pero no pudimos recalcular el total.');
-      await loadAdminData(supabase, sessionUser);
-      return;
-    }
-
-    const { error: paymentError } = await supabase
-      .from('pagos')
-      .update({ monto: nextTotal })
-      .eq('orden_id', order.id);
-
+    await loadAdminData(supabase, sessionUser);
     setSaving(false);
-
     setOrderQuantityDrafts((currentDrafts) => {
       const nextDrafts = { ...currentDrafts };
       delete nextDrafts[detail.id];
       return nextDrafts;
     });
 
-    await loadAdminData(supabase, sessionUser);
-    showMessage(paymentError ? 'Cantidad actualizada, pero no pudimos sincronizar pagos.' : 'Cantidad y total actualizados.');
+    const updatedTotal = Array.isArray(data) ? data[0]?.total : data?.total;
+    showMessage(updatedTotal ? `Cantidad, total y stock actualizados: ${formatPrice(updatedTotal)}.` : 'Cantidad, total y stock actualizados.');
   };
 
   const handleManualOrderChange = (event) => {

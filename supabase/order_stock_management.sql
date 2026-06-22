@@ -154,6 +154,10 @@ declare
   v_available_stock int;
   v_product_name text;
 begin
+  if current_setting('app.skip_stock_trigger', true) = 'on' then
+    return null;
+  end if;
+
   select estado::text, stock_descontado
   into v_estado, v_stock_descontado
   from public.ordenes
@@ -264,3 +268,160 @@ after insert or update or delete
 on public.detalles_orden
 for each row
 execute function public.gestionar_stock_por_detalle_orden();
+
+create or replace function public.admin_actualizar_cantidad_detalle_orden(
+  p_detalle_id bigint,
+  p_cantidad int
+)
+returns table (
+  orden_id bigint,
+  total numeric
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_detail record;
+  v_delta int;
+  v_missing record;
+  v_next_total numeric;
+begin
+  if not public.es_admin() then
+    raise exception 'Solo un administrador puede modificar cantidades de ordenes.';
+  end if;
+
+  if p_cantidad is null or p_cantidad <= 0 then
+    raise exception 'La cantidad debe ser mayor a cero.';
+  end if;
+
+  select
+    d.id,
+    d.orden_id,
+    d.producto_id,
+    d.cantidad,
+    d.precio_unitario,
+    o.estado::text as estado,
+    o.stock_descontado
+  into v_detail
+  from public.detalles_orden d
+  join public.ordenes o on o.id = d.orden_id
+  where d.id = p_detalle_id
+  for update of d, o;
+
+  if not found then
+    raise exception 'No encontramos el detalle de orden indicado.';
+  end if;
+
+  if p_cantidad = v_detail.cantidad then
+    select coalesce(sum(cantidad * precio_unitario), 0)
+    into v_next_total
+    from public.detalles_orden
+    where detalles_orden.orden_id = v_detail.orden_id;
+
+    orden_id := v_detail.orden_id;
+    total := v_next_total;
+    return next;
+    return;
+  end if;
+
+  v_delta := p_cantidad - v_detail.cantidad;
+
+  if v_detail.estado in ('pagada', 'enviada', 'entregada') then
+    if v_detail.stock_descontado then
+      if v_delta > 0 then
+        select p.nombre, p.stock, v_delta as cantidad_requerida
+        into v_missing
+        from public.productos p
+        where p.id = v_detail.producto_id
+          and p.stock < v_delta
+        for update;
+
+        if found then
+          raise exception 'Stock insuficiente para %. Stock actual: %, requerido adicional: %.',
+            v_missing.nombre,
+            v_missing.stock,
+            v_missing.cantidad_requerida;
+        end if;
+
+        update public.productos
+        set stock = stock - v_delta
+        where id = v_detail.producto_id;
+      elsif v_delta < 0 then
+        update public.productos
+        set stock = stock + abs(v_delta)
+        where id = v_detail.producto_id;
+      end if;
+    else
+      with cantidades_deseadas as (
+        select
+          producto_id,
+          case when id = p_detalle_id then p_cantidad else cantidad end as cantidad
+        from public.detalles_orden
+        where detalles_orden.orden_id = v_detail.orden_id
+      ),
+      agrupadas as (
+        select producto_id, sum(cantidad)::int as cantidad
+        from cantidades_deseadas
+        group by producto_id
+      )
+      select p.nombre, p.stock, a.cantidad as cantidad_requerida
+      into v_missing
+      from agrupadas a
+      join public.productos p on p.id = a.producto_id
+      where p.stock < a.cantidad
+      limit 1;
+
+      if found then
+        raise exception 'Stock insuficiente para %. Stock actual: %, requerido: %.',
+          v_missing.nombre,
+          v_missing.stock,
+          v_missing.cantidad_requerida;
+      end if;
+
+      update public.productos p
+      set stock = p.stock - a.cantidad
+      from (
+        select
+          producto_id,
+          sum(case when id = p_detalle_id then p_cantidad else cantidad end)::int as cantidad
+        from public.detalles_orden
+        where detalles_orden.orden_id = v_detail.orden_id
+        group by producto_id
+      ) a
+      where p.id = a.producto_id;
+
+      update public.ordenes
+      set stock_descontado = true
+      where id = v_detail.orden_id;
+    end if;
+  end if;
+
+  perform set_config('app.skip_stock_trigger', 'on', true);
+
+  update public.detalles_orden
+  set cantidad = p_cantidad
+  where id = p_detalle_id;
+
+  perform set_config('app.skip_stock_trigger', 'off', true);
+
+  select coalesce(sum(cantidad * precio_unitario), 0)
+  into v_next_total
+  from public.detalles_orden
+  where detalles_orden.orden_id = v_detail.orden_id;
+
+  update public.ordenes
+  set total = v_next_total
+  where id = v_detail.orden_id;
+
+  update public.pagos
+  set monto = v_next_total
+  where pagos.orden_id = v_detail.orden_id;
+
+  orden_id := v_detail.orden_id;
+  total := v_next_total;
+  return next;
+end;
+$$;
+
+grant execute on function public.admin_actualizar_cantidad_detalle_orden(bigint, int) to authenticated;
