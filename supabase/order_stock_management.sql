@@ -7,6 +7,7 @@
 -- - Repone stock si una orden ya descontada pasa a "cancelada" o vuelve a un estado no pagado.
 -- - Evita stock negativo con una excepcion clara.
 -- - Si se edita una linea de una orden ya descontada, ajusta stock por diferencia.
+-- - Si una orden pagada quedo vieja con stock_descontado = false, la reconcilia al editarla.
 
 alter table public.ordenes
 add column if not exists stock_descontado boolean not null default false;
@@ -158,7 +159,12 @@ begin
   from public.ordenes
   where id = v_orden_id;
 
-  if v_estado not in ('pagada', 'enviada', 'entregada') or not v_stock_descontado then
+  if v_estado not in ('pagada', 'enviada', 'entregada') then
+    return null;
+  end if;
+
+  if not v_stock_descontado then
+    perform public.descontar_stock_orden(v_orden_id);
     return null;
   end if;
 

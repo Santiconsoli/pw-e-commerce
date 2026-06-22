@@ -149,6 +149,7 @@ export default function AdminPage() {
           mercadopago_status,
           mercadopago_payment_id,
           pagado_en,
+          stock_descontado,
           usuario_id,
           cliente_nombre,
           cliente_email,
@@ -463,9 +464,10 @@ export default function AdminPage() {
     }
 
     const paidStatus = paidOrderStatuses.includes(order.estado);
+    const paidAndAlreadyDiscounted = paidStatus && order.stock_descontado;
     const product = products.find((currentProduct) => String(currentProduct.id) === String(detail.producto_id));
     const availableStock = Number(product?.stock ?? detail.productos?.stock ?? 0);
-    const requiredStock = paidStatus ? Math.max(nextQuantity - currentQuantity, 0) : nextQuantity;
+    const requiredStock = paidAndAlreadyDiscounted ? Math.max(nextQuantity - currentQuantity, 0) : nextQuantity;
 
     if (requiredStock > availableStock) {
       showMessage(`Stock insuficiente. Disponible: ${availableStock}.`);
