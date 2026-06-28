@@ -20,6 +20,11 @@ const formatDate = (value) =>
     year: 'numeric'
   }).format(new Date(value));
 
+const getSafeNextPath = (value) =>
+  typeof value === 'string' && value.startsWith('/') && !value.startsWith('//')
+    ? value
+    : '/';
+
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState('register');
@@ -36,7 +41,7 @@ export default function LoginPage() {
   const [isAccountLoading, setAccountLoading] = useState(false);
   const [accountError, setAccountError] = useState('');
 
-  const nextPath = typeof router.query.next === 'string' ? router.query.next : '/';
+  const nextPath = getSafeNextPath(router.query.next);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
 
   const getRedirectUrl = () => {

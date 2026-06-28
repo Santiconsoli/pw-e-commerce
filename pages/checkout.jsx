@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import {
@@ -26,7 +25,6 @@ const formatPrice = (value) =>
   }).format(value);
 
 export default function CheckoutPage() {
-  const router = useRouter();
   const [cartItems, setCartItems] = useState([]);
   const [isCartReady, setCartReady] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -119,75 +117,6 @@ export default function CheckoutPage() {
     const timer = window.setTimeout(() => setToastMessage(''), 2600);
     setToastTimer(timer);
   };
-
-  const clearCartAndGoHome = () => {
-    localStorage.removeItem(CART_STORAGE_KEY);
-    setCartItems([]);
-    router.replace('/');
-  };
-
-  useEffect(() => {
-    if (!router.isReady || !router.query.payment) {
-      return;
-    }
-
-    const messages = {
-      success: 'Pago aprobado. Tu pedido quedó registrado.',
-      pending: 'Pago pendiente. Te avisaremos cuando se confirme.',
-      failure: 'El pago no se pudo completar. Podés intentarlo nuevamente.'
-    };
-
-    if (router.query.payment === 'success') {
-      return;
-    }
-
-    showToast(messages[router.query.payment] || 'Volviste del proceso de pago.');
-  }, [router.isReady, router.query.payment]);
-
-  useEffect(() => {
-    if (!router.isReady || !router.query.payment || !router.query.order) {
-      if (router.isReady && router.query.payment === 'success') {
-        clearCartAndGoHome();
-      }
-      return;
-    }
-
-    const getQueryValue = (value) => (Array.isArray(value) ? value[0] : value);
-    const paymentId =
-      getQueryValue(router.query.payment_id) ||
-      getQueryValue(router.query.collection_id) ||
-      getQueryValue(router.query['data.id']) ||
-      null;
-    const merchantOrderId = getQueryValue(router.query.merchant_order_id) || null;
-    const preferenceId = getQueryValue(router.query.preference_id) || null;
-
-    fetch('/api/payments/confirm-return', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        orderId: getQueryValue(router.query.order),
-        paymentId,
-        merchantOrderId,
-        preferenceId
-      })
-    })
-      .then((response) => response.json().catch(() => ({})))
-      .then((data) => {
-        if (router.query.payment === 'success' || data.orderStatus === 'pagada') {
-          clearCartAndGoHome();
-        }
-      })
-      .catch(() => {
-        if (router.query.payment === 'success') {
-          clearCartAndGoHome();
-          return;
-        }
-
-        showToast('El pago quedó iniciado. Estamos esperando la confirmación.');
-      });
-  }, [router.isReady, router.query.payment, router.query.order]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;

@@ -569,6 +569,18 @@ img {
     background-color: #171717;
 }
 
+.btn-add:disabled {
+    border-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.035);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.btn-add:disabled:hover {
+    border-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.035);
+}
+
 /* Main */
 main {
     overflow: hidden;

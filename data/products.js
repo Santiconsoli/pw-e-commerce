@@ -3,6 +3,7 @@ export const products = [
     id: 'mesa-bmw',
     name: 'Mesa BMW',
     price: 452000,
+    stock: 10,
     image: '/assets/productos/mesa-bmw.png',
     alt: 'Mesa BMW'
   },
@@ -10,6 +11,7 @@ export const products = [
     id: 'reloj-mclaren',
     name: 'Reloj McLaren',
     price: 150000,
+    stock: 10,
     image: '/assets/productos/reloj-mclaren.png',
     alt: 'Reloj McLaren'
   },
@@ -17,6 +19,7 @@ export const products = [
     id: 'porta-cepillos-v10',
     name: 'Porta Cepillos V10',
     price: 50500,
+    stock: 10,
     image: '/assets/productos/porta-cepillos-v10.png',
     alt: 'Porta Cepillos V10'
   },
@@ -24,6 +27,7 @@ export const products = [
     id: 'lampara-ciguenal',
     name: 'Lámpara Cigüeñal',
     price: 68000,
+    stock: 10,
     image: '/assets/productos/lampara-ciguenal.png',
     alt: 'Lámpara Cigüeñal'
   }

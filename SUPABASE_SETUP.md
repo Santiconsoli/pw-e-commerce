@@ -22,6 +22,7 @@ Variables privadas para servidor:
 ```env
 SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 MERCADOPAGO_ACCESS_TOKEN=tu_access_token_de_mercado_pago
+MERCADOPAGO_WEBHOOK_SECRET=tu_webhook_secret_opcional
 ```
 
 Estas variables privadas van en Vercel, pero no deben empezar con `NEXT_PUBLIC_`.
@@ -74,13 +75,16 @@ Si hay un solo usuario en `public.usuarios`, el script lo convierte automáticam
 
 ## 7. Preparar transacciones y Mercado Pago
 1. En Supabase SQL Editor, ejecutá `supabase/payments_and_checkout.sql`.
-2. En Vercel, agregá `SUPABASE_SERVICE_ROLE_KEY`.
-3. En Vercel, agregá `MERCADOPAGO_ACCESS_TOKEN`.
-4. En Vercel, revisá que `NEXT_PUBLIC_SITE_URL` tenga la URL pública de producción.
-5. En Mercado Pago, configurá el webhook apuntando a:
+2. Ejecutá `supabase/order_stock_management.sql` para activar la gestión automática de stock.
+3. En Vercel, agregá `SUPABASE_SERVICE_ROLE_KEY`.
+4. En Vercel, agregá `MERCADOPAGO_ACCESS_TOKEN`.
+5. En Vercel, revisá que `NEXT_PUBLIC_SITE_URL` tenga la URL pública de producción.
+6. En Mercado Pago, configurá el webhook apuntando a:
 
 ```txt
 https://tu-dominio-de-vercel.vercel.app/api/payments/webhook
 ```
+
+Si configurás una clave secreta para el webhook en Mercado Pago, agregala también en Vercel como `MERCADOPAGO_WEBHOOK_SECRET`.
 
 El checkout crea la orden con una función transaccional en Supabase, genera la preferencia de Mercado Pago desde una API server-side y actualiza el estado de la orden cuando Mercado Pago llama al webhook.

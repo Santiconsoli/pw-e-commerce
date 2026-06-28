@@ -100,6 +100,7 @@ declare
   v_product_id bigint;
   v_product_nombre text;
   v_product_price decimal(10, 2);
+  v_product_stock int;
   v_quantity int;
 begin
   if v_user_id is null then
@@ -164,21 +165,28 @@ begin
     v_product_price := null;
 
     if coalesce(v_item->>'id', '') ~ '^\d+$' then
-      select p.id, p.nombre, p.precio
-      into v_product_id, v_product_nombre, v_product_price
+      select p.id, p.nombre, p.precio, p.stock
+      into v_product_id, v_product_nombre, v_product_price, v_product_stock
       from public.productos p
       where p.id = (v_item->>'id')::bigint;
     end if;
 
     if v_product_id is null and coalesce(v_item->>'name', '') <> '' then
-      select p.id, p.nombre, p.precio
-      into v_product_id, v_product_nombre, v_product_price
+      select p.id, p.nombre, p.precio, p.stock
+      into v_product_id, v_product_nombre, v_product_price, v_product_stock
       from public.productos p
       where p.nombre = v_item->>'name';
     end if;
 
     if v_product_id is null then
       raise exception 'Uno de los productos ya no esta disponible.';
+    end if;
+
+    if coalesce(v_product_stock, 0) < v_quantity then
+      raise exception 'Stock insuficiente para %. Stock actual: %, requerido: %.',
+        v_product_nombre,
+        coalesce(v_product_stock, 0),
+        v_quantity;
     end if;
 
     insert into public.detalles_orden (
